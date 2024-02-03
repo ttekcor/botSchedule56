@@ -197,5 +197,5 @@ def callback(call):
         markup.add(bug)
         msg = bot.send_message(call.chat.id,"Заново?",reply_markup=markup)    
         bot.register_next_step_handler(msg, start)
-
-bot.polling()    
+if __name__ =="__main__":
+    bot.polling()    
