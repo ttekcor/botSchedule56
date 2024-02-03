@@ -7,11 +7,11 @@ def func_const(n):
     return a
 def separator(n):
     match n:
-        case 'Понедельник': return r'.\botSchedule56\sch_pn.xlsx'
-        case 'Вторник': return r'.\botSchedule56\sch_vt.xlsx'
-        case 'Среда': return r'.\botSchedule56\sch_sr.xlsx'
-        case 'Четверг': return r'.\botSchedule56\sch_cht.xlsx'
-        case 'Пятница': return r'.\botSchedule56\sch_pt.xlsx' 
+        case 'Понедельник': return r'sch_pn.xlsx'
+        case 'Вторник': return r'sch_vt.xlsx'
+        case 'Среда': return r'sch_sr.xlsx'
+        case 'Четверг': return r'sch_cht.xlsx'
+        case 'Пятница': return r'sch_pt.xlsx' 
 
 def slicer(n,path):
     op = pd.read_excel(func_const(path))
