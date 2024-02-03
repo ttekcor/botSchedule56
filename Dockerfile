@@ -1,4 +1,4 @@
-FROM python:3.12.0-bullseye
+FROM python:3.12.0
 ADD . /usr/src/app/
 WORKDIR /usr/src/app
 RUN apt update && apt -y upgrade
