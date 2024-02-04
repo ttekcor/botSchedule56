@@ -69,32 +69,32 @@ def seq(message):
     day_of_week = message.text
     if message.text=="Понедельник":
         downloaded_file = bot.download_file(file_info.file_path)
-        src = r'.\sch_pn.xlsx'
+        src = r'sch_pn.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_pn.xlsx bot:/sch_pn.xlsx')
         bot.reply_to(message, "Пожалуй, я сохраню это")
     elif message.text=="Вторник":
         downloaded_file = bot.download_file(file_info.file_path)
-        src = r'.\sch_vt.xlsx'
+        src = r'sch_vt.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         bot.reply_to(message, "Пожалуй, я сохраню это")
     elif message.text=="Среда":
         downloaded_file = bot.download_file(file_info.file_path)
-        src = r'.\sch_sr.xlsx'
+        src = r'sch_sr.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         bot.reply_to(message, "Пожалуй, я сохраню это")
     elif message.text=="Четверг":
         downloaded_file = bot.download_file(file_info.file_path)
-        src = r'.\sch_cht.xlsx'
+        src = r'sch_cht.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         bot.reply_to(message, "Пожалуй, я сохраню это")
     elif message.text=="Пятница":
         downloaded_file = bot.download_file(file_info.file_path)
-        src = r'.\sch_pt.xlsx'
+        src = r'sch_pt.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         bot.reply_to(message, "Пожалуй, я сохраню это")
