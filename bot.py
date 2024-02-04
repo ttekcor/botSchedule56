@@ -79,24 +79,28 @@ def seq(message):
         src = r'sch_vt.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
+        os.system('docker cp sch_vt.xlsx bot:/sch_vt.xlsx')
         bot.reply_to(message, "Пожалуй, я сохраню это")
     elif message.text=="Среда":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_sr.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
+        os.system('docker cp sch_sr.xlsx bot:/sch_sr.xlsx')
         bot.reply_to(message, "Пожалуй, я сохраню это")
     elif message.text=="Четверг":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_cht.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
+        os.system('docker cp sch_cht.xlsx bot:/sch_cht.xlsx')
         bot.reply_to(message, "Пожалуй, я сохраню это")
     elif message.text=="Пятница":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_pt.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
+        os.system('docker cp sch_pt.xlsx bot:/sch_pt.xlsx')
         bot.reply_to(message, "Пожалуй, я сохраню это")
     bot.register_next_step_handler(message,start)
 
