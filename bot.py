@@ -87,7 +87,7 @@ def seq(message):
         src = r'sch_pn.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
-        #os.system('docker cp sch_pn.xlsx bot:/sch_pn.xlsx')
+        os.system('docker cp sch_pn.xlsx bot:/sch_pn.xlsx')
         bot.reply_to(message, "Пожалуй, я сохраню это")
         bot.register_next_step_handler(message,select)
     elif message.text=="Вторник!":
