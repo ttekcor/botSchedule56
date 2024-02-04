@@ -1,6 +1,8 @@
 import pandas as pd
 import openpyxl
 import numpy as np
+from googletrans import Translator, constants
+
 a = ''
 def func_const(n):
     a = separator(n)
@@ -35,5 +37,7 @@ def imagine():
         res = y['Author'][index],y['Quote'][index]
     result = ",".join(res)
     return result
+
+
 
 

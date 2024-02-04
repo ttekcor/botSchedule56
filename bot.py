@@ -7,25 +7,37 @@ from ts import slicer,imagine
 bot = telebot.TeleBot('5895426188:AAGeesw_OVKurBcmJaNv-aUJ46t0vwYhx7M')
 day_of_week = ""
 password = '!botcheck56'
-@bot.message_handler(commands=['start'])  
+@bot.message_handler(commands=['start']) 
+def select(message):
+    full_name = f'Привет, <u>{message.from_user.first_name} {message.from_user.last_name}</u>, Для того чтобы просмотреть расписание напиши команду /day.'
+    bot.send_message(message.chat.id, full_name, parse_mode='html')
+
+
+@bot.message_handler(commands=['day'])  
 def start(message):  
-        bot.delete_messages(chat_id=message.chat.id, message_id=message.message_id - 1) 
-        bot.delete_my_commands(chat_id=message.chat.id, message_id=message.message_id - 1)
-        markup = types.ReplyKeyboardMarkup(row_width=3)
-        pn = types.InlineKeyboardButton('Понедельник',callback_data='pn')
-        vt = types.InlineKeyboardButton('Вторник',callback_data='vt')
-        sr = types.InlineKeyboardButton('Среда',callback_data='sr')
-        cht = types.InlineKeyboardButton('Четверг',callback_data='cht')
-        pt = types.InlineKeyboardButton('Пятница',callback_data='pt')
-        markup.add(pn,vt,sr,cht,pt)  
-        bot.send_message(message.chat.id,'День недели:',reply_markup=markup)
-        @bot.message_handler(content_types=['text'])  
-        def day(message):
+    markup = types.ReplyKeyboardMarkup(row_width=3)
+    pn = types.InlineKeyboardButton('Понедельник',callback_data='pn')
+    vt = types.InlineKeyboardButton('Вторник',callback_data='vt')
+    sr = types.InlineKeyboardButton('Среда',callback_data='sr')
+    cht = types.InlineKeyboardButton('Четверг',callback_data='cht')
+    pt = types.InlineKeyboardButton('Пятница',callback_data='pt')
+    markup.add(pn,vt,sr,cht,pt)  
+    bot.send_message(message.chat.id,'День недели:',reply_markup=markup)
+    @bot.message_handler(content_types=['text'])  
+    def day(message):
+        if message.text == 'Понедельник'or message.text == 'Вторник' or message.text =='Среда' or message.text =='Четверг' or message.text =='Пятница':
             global day_of_week  
             day_of_week = message.text
-                
-        bot.register_next_step_handler(message, day)
-        bot.register_next_step_handler(message, button)
+            
+            bot.register_next_step_handler(message, button)
+        else:  
+            markup1 = types.ReplyKeyboardMarkup(row_width=3) 
+            er_or = types.InlineKeyboardButton('Заново',callback_data='repeat')
+            markup1.add(er_or)
+            bot.send_message(message.chat.id,"Неверно введен день недели",reply_markup=markup1)
+            bot.register_next_step_handler(message,start)
+
+
 
 
 @bot.message_handler(commands=['admin']) 
@@ -40,19 +52,20 @@ def admin(message):
             bot.register_next_step_handler(message,day_admin)
         else:
             bot.send_message(message.chat.id,'Неверный пароль')
+            bot.register_next_step_handler(message,admin)
         
     
     bot.register_next_step_handler(message,check)
 
 
-@bot.message_handler(content_types=['text'])
+@bot.message_handler(content_types=['admin'])
 def day_admin(message):   
     markup = types.ReplyKeyboardMarkup(row_width=3)
-    pn = types.InlineKeyboardButton('Понедельник',callback_data='pn')
-    vt = types.InlineKeyboardButton('Вторник',callback_data='vt')
-    sr = types.InlineKeyboardButton('Среда',callback_data='sr')
-    cht = types.InlineKeyboardButton('Четверг',callback_data='cht')
-    pt = types.InlineKeyboardButton('Пятница',callback_data='pt')
+    pn = types.InlineKeyboardButton('Понедельник!',callback_data='pn')
+    vt = types.InlineKeyboardButton('Вторник!',callback_data='vt')
+    sr = types.InlineKeyboardButton('Среда!',callback_data='sr')
+    cht = types.InlineKeyboardButton('Четверг!',callback_data='cht')
+    pt = types.InlineKeyboardButton('Пятница!',callback_data='pt')
     markup.add(pn,vt,sr,cht,pt)  
     bot.send_message(message.chat.id,'День недели:',reply_markup=markup)                
     
@@ -69,42 +82,43 @@ def handle_docs_audio(message):
 def seq(message):
     global day_of_week
     day_of_week = message.text
-    if message.text=="Понедельник":
+    if message.text=="Понедельник!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_pn.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
-        os.system('docker cp sch_pn.xlsx bot:/sch_pn.xlsx')
+        #os.system('docker cp sch_pn.xlsx bot:/sch_pn.xlsx')
         bot.reply_to(message, "Пожалуй, я сохраню это")
-    elif message.text=="Вторник":
+        bot.register_next_step_handler(message,select)
+    elif message.text=="Вторник!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_vt.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_vt.xlsx bot:/sch_vt.xlsx')
         bot.reply_to(message, "Пожалуй, я сохраню это")
-    elif message.text=="Среда":
+    elif message.text=="Среда!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_sr.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_sr.xlsx bot:/sch_sr.xlsx')
         bot.reply_to(message, "Пожалуй, я сохраню это")
-    elif message.text=="Четверг":
+    elif message.text=="Четверг!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_cht.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_cht.xlsx bot:/sch_cht.xlsx')
         bot.reply_to(message, "Пожалуй, я сохраню это")
-    elif message.text=="Пятница":
+    elif message.text=="Пятница!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_pt.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_pt.xlsx bot:/sch_pt.xlsx')
         bot.reply_to(message, "Пожалуй, я сохраню это")
-    bot.register_next_step_handler(message,start)
+    
 
 
 @bot.callback_query_handler(func=lambda message:True)
@@ -245,13 +259,14 @@ def callback(call):
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
                 bot.send_message(chat_id,imagine()) 
-            
-        markup = types.ReplyKeyboardMarkup(row_width=3) 
-        global bug
-        bug = types.InlineKeyboardButton('Еще разок',callback_data='bug')
-        markup.add(bug)
-        msg = bot.send_message(call.chat.id,"Заново?",reply_markup=markup)    
-        bot.register_next_step_handler(msg, start)
-
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True) 
+            global bug
+            bug = types.InlineKeyboardButton('Еще разок',callback_data='bug')
+            #clear = types.InlineKeyboardButton('Очистить всё?',callback_data='clear')
+            markup.add(bug)
+            msg = bot.send_message(call.chat.id,"Заново?",reply_markup=markup)   
+            if call:
+                bot.register_next_step_handler(call,start)
+        
 if __name__ =="__main__":
     bot.polling()    
