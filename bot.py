@@ -8,7 +8,9 @@ bot = telebot.TeleBot('5895426188:AAGeesw_OVKurBcmJaNv-aUJ46t0vwYhx7M')
 day_of_week = ""
 password = '!botcheck56'
 @bot.message_handler(commands=['start'])  
-def start(message):   
+def start(message):  
+        bot.delete_messages(chat_id=message.chat.id, message_id=message.message_id - 1) 
+        bot.delete_my_commands(chat_id=message.chat.id, message_id=message.message_id - 1)
         markup = types.ReplyKeyboardMarkup(row_width=3)
         pn = types.InlineKeyboardButton('Понедельник',callback_data='pn')
         vt = types.InlineKeyboardButton('Вторник',callback_data='vt')
