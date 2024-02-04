@@ -1,6 +1,6 @@
 import telebot
 from telebot import types
-
+import os
 import pandas as pd
 from ts import slicer,imagine
 
@@ -72,6 +72,7 @@ def seq(message):
         src = r'.\sch_pn.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
+        os.system('docker cp sch_pn.xlsx bot:/sch_pn.xlsx')
         bot.reply_to(message, "Пожалуй, я сохраню это")
     elif message.text=="Вторник":
         downloaded_file = bot.download_file(file_info.file_path)
