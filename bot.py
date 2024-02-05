@@ -242,14 +242,14 @@ def callback(call):
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res) 
                 bot.send_message(chat_id,imagine())
-            elif call.text == '10А':
+            elif call.text == '10A':
                 chat_id = call.chat.id
-                bot.send_message(chat_id,"10А")
+                bot.send_message(chat_id,"10A")
                 for _,text in slicer(call.text,day_of_week):
                     
                     res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                    bot.send_message(chat_id,res)
+                bot.send_message(chat_id,imagine()) 
             elif call.text == '10Б':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"10Б")
