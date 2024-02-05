@@ -50,12 +50,16 @@ def start(message):
             
             bot.send_message(message.chat.id,'Класс:',reply_markup=markup)
             bot.register_next_step_handler(message, callback) 
+        elif message.text == "Да, еще раз!":
+            bot.send_message(message.chat.id,'Точно?')
+            bot.register_next_step_handler(message,start)
         else:  
             markup1 = types.ReplyKeyboardMarkup(row_width=3) 
             er_or = types.InlineKeyboardButton('Заново',callback_data='repeat')
             markup1.add(er_or)
             bot.send_message(message.chat.id,"Неверно введен день недели",reply_markup=markup1)
             bot.register_next_step_handler(message,start)
+            
     
 
 
@@ -108,7 +112,7 @@ def seq(message):
         src = r'sch_pn.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
-        #os.system('docker cp sch_pn.xlsx bot:/sch_pn.xlsx')
+        os.system('docker cp sch_pn.xlsx bot:/sch_pn.xlsx')
         bot.reply_to(message, "Спасибо, сохранил!")
         bot.register_next_step_handler(message,select)
     elif message.text=="Вторник!":
@@ -116,28 +120,28 @@ def seq(message):
         src = r'sch_vt.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
-        #os.system('docker cp sch_vt.xlsx bot:/sch_vt.xlsx')
+        os.system('docker cp sch_vt.xlsx bot:/sch_vt.xlsx')
         bot.reply_to(message, "Спасибо, сохранил!")
     elif message.text=="Среда!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_sr.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
-        #os.system('docker cp sch_sr.xlsx bot:/sch_sr.xlsx')
+        os.system('docker cp sch_sr.xlsx bot:/sch_sr.xlsx')
         bot.reply_to(message, "Спасибо, сохранил!")
     elif message.text=="Четверг!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_cht.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
-        #os.system('docker cp sch_cht.xlsx bot:/sch_cht.xlsx')
+        os.system('docker cp sch_cht.xlsx bot:/sch_cht.xlsx')
         bot.reply_to(message, "Спасибо, сохранил!")
     elif message.text=="Пятница!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_pt.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
-        #os.system('docker cp sch_pt.xlsx bot:/sch_pt.xlsx')
+        os.system('docker cp sch_pt.xlsx bot:/sch_pt.xlsx')
         bot.reply_to(message, "Спасибо, сохранил!")
     @bot.message_handler(content_types=['text'])
     def outer(message): 
@@ -263,13 +267,13 @@ def callback(call):
                     bot.send_message(chat_id,res)
                 bot.send_message(chat_id,imagine())
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            bug = types.InlineKeyboardButton('Заново',callback_data='bug')
+            bug = types.InlineKeyboardButton('Да, еще раз!',callback_data='bug')
             markup.add(bug)
             bot.send_message(call.chat.id,"Еще разок?",reply_markup=markup)
             
             @bot.message_handler(content_types=['text'])
             def outer(message): 
-                if message.text == "Заново":
+                if message.text == "Да, еще раз!":
                     
                     bot.register_next_step_handler(message,start)
                 elif message.text == '/admin':
