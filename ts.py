@@ -4,6 +4,8 @@ import numpy as np
 from googletrans import Translator, constants
 
 a = ''
+password = 'Oksanakoren'
+token = '5895426188:AAGeesw_OVKurBcmJaNv-aUJ46t0vwYhx7M'
 def func_const(n):
     a = separator(n)
     return a
