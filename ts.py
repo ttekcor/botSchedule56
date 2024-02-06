@@ -6,6 +6,7 @@ from googletrans import Translator, constants
 a = ''
 password = 'Oksanakoren'
 token = '5895426188:AAGeesw_OVKurBcmJaNv-aUJ46t0vwYhx7M'
+#token = '6779562330:AAE_d_QKj1n59lgJU_JT6s6PO4atUMlnUcM'
 def func_const(n):
     a = separator(n)
     return a
@@ -16,7 +17,8 @@ def separator(n):
         case 'Среда': return r'sch_sr.xlsx'
         case 'Четверг': return r'sch_cht.xlsx'
         case 'Пятница': return r'sch_pt.xlsx' 
-
+#
+    
 def slicer(n,path):
     op = pd.read_excel(func_const(path))
     
@@ -40,6 +42,6 @@ def imagine():
     result = ",".join(res)
     return result
 
-
+# slicer_teach()
 
 
