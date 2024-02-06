@@ -26,6 +26,7 @@ def start(message):
     def day(message):
          
         if message.text == 'Понедельник'or message.text == 'Вторник' or message.text =='Среда' or message.text =='Четверг' or message.text =='Пятница':
+            
             global day_of_week  
             day_of_week = message.text
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -154,9 +155,10 @@ def seq(message):
 @bot.callback_query_handler(func=lambda call:True)
 def callback(call):
         if call:
+            #print(call.text)
             if call.text == '7A':
                 chat_id = call.chat.id
-                bot.send_message(chat_id,"7А")
+                bot.send_message(chat_id,"7A")
                 for _,text in slicer(call.text,day_of_week):
                     
                     res = str(_) + " " + str(text)
@@ -186,9 +188,9 @@ def callback(call):
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res) 
                 bot.send_message(chat_id,imagine())
-            elif call.text == '8А':
+            elif call.text == '8A':
                 chat_id = call.chat.id
-                bot.send_message(chat_id,"8А")
+                bot.send_message(chat_id,"8A")
                 for _,text in slicer(call.text,day_of_week):
                     
                     res = str(_) + " " + str(text)
@@ -234,9 +236,9 @@ def callback(call):
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res) 
                 bot.send_message(chat_id,imagine())
-            elif call.text == '9В':
+            elif call.text == '9B':
                 chat_id = call.chat.id
-                bot.send_message(chat_id,"9В")
+                bot.send_message(chat_id,"9B")
                 for _,text in slicer(call.text,day_of_week):
                     
                     res = str(_) + " " + str(text)
