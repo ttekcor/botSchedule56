@@ -116,6 +116,7 @@ def seq(message):
         os.system('docker cp sch_pn.xlsx bot:/sch_pn.xlsx')
         bot.reply_to(message, "Спасибо, сохранил!")
         bot.register_next_step_handler(message,select)
+        
     elif message.text=="Вторник!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_vt.xlsx'
