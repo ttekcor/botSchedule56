@@ -395,4 +395,4 @@ def callback(call):
 
         
 if __name__ =="__main__":
-    bot.polling()    
+    bot.polling(none_stop=True, interval = 5)  
