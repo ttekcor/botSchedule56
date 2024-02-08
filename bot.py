@@ -3,6 +3,7 @@ from telebot import types
 import os
 import pandas as pd
 from ts import slicer,imagine,token,password,slicer_teach
+from time import sleep
 
 bot = telebot.TeleBot(token)
 day_of_week = ""
@@ -54,6 +55,9 @@ def start(message):
         elif message.text == "Да, еще раз!":
             bot.send_message(message.chat.id,'Точно?')
             bot.register_next_step_handler(message,start)
+        elif message.text == "/teacher":
+            
+            bot.register_next_step_handler(message,teacher_day)
         else:  
             markup1 = types.ReplyKeyboardMarkup(row_width=3) 
             er_or = types.InlineKeyboardButton('Заново',callback_data='repeat')
@@ -64,25 +68,27 @@ def start(message):
 @bot.message_handler(commands=['teacher'])  
 def teacher_day(message):
     markup = types.ReplyKeyboardMarkup(row_width=3)
-    pn = types.InlineKeyboardButton('Понедельник',callback_data='pn')
-    vt = types.InlineKeyboardButton('Вторник',callback_data='vt')
-    sr = types.InlineKeyboardButton('Среда',callback_data='sr')
-    cht = types.InlineKeyboardButton('Четверг',callback_data='cht')
-    pt = types.InlineKeyboardButton('Пятница',callback_data='pt')
-    markup.add(pn,vt,sr,cht,pt)  
+    pn1 = types.InlineKeyboardButton('Понедельник',callback_data='pn1')
+    vt1 = types.InlineKeyboardButton('Вторник',callback_data='vt1')
+    sr1 = types.InlineKeyboardButton('Среда',callback_data='sr1')
+    cht1 = types.InlineKeyboardButton('Четверг',callback_data='cht1')
+    pt1 = types.InlineKeyboardButton('Пятница',callback_data='pt1')
+    markup.add(pn1,vt1,sr1,cht1,pt1)  
     bot.send_message(message.chat.id,'День недели:',reply_markup=markup)
     @bot.message_handler(content_types=['text']) 
     def teacher_erorr(message):
-         
+        #message.text = message.text[:-1]
+        
         if message.text == 'Понедельник'or message.text == 'Вторник' or message.text =='Среда' or message.text =='Четверг' or message.text =='Пятница':
             
             global day_of_week  
             day_of_week = message.text
+            
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             id0 = types.InlineKeyboardButton('Паранько',callback_data='Паранько')
             id1 = types.InlineKeyboardButton('Баженова',callback_data='Баженова')
             id2 = types.InlineKeyboardButton('Толмачева',callback_data='Толмачева')
-            id3 = types.InlineKeyboardButton('Гарбузова',callback_data='7v')
+            id3 = types.InlineKeyboardButton('Гарбузова',callback_data='Гарбузова')
             id4 = types.InlineKeyboardButton('Дзыгун',callback_data='Дзыгун')
             id5 = types.InlineKeyboardButton('Гредякина',callback_data='Гредякина')
             id6 = types.InlineKeyboardButton('Розамаскин',callback_data='Розамаскин')
@@ -112,19 +118,16 @@ def teacher_day(message):
             
             
             
-            markup.add(id1,id2,id3,id4,id5,id6,id7,id8,id9,id10,id11,id12,id13,id14,id15,id16,id17,id18,id19,id20,id21,id22,id23,id24,id25,id26,id27,id28)
+            markup.add(id1,id2,id3,id4,id5,id6,id7,id8,id9,id10,id0,id11,id12,id13,id14,id15,id16,id17,id18,id19,id20,id21,id22,id23,id24,id25,id26,id27,id28)
             
             bot.send_message(message.chat.id,'Учитель:',reply_markup=markup)
             bot.register_next_step_handler(message, callback_teacher) 
-        elif message.text == "Да, еще раз!":
-            bot.send_message(message.chat.id,'Точно?')
-            bot.register_next_step_handler(message,start)
         else:  
             markup1 = types.ReplyKeyboardMarkup(row_width=3) 
-            er_or = types.InlineKeyboardButton('Заново',callback_data='repeat')
+            er_or = types.InlineKeyboardButton('Заново',callback_data='repeat1')
             markup1.add(er_or)
-            bot.send_message(message.chat.id,"Неверно введена фамилия учителя",reply_markup=markup1)
-            bot.register_next_step_handler(message,start)
+            bot.send_message(message.chat.id,"Неверно день недели",reply_markup=markup1)
+            bot.register_next_step_handler(message,teacher_day)
 
 
 
@@ -257,8 +260,19 @@ def callback_teacher(call):
             
             bot.send_message(chat_id,res)
         bot.send_message(chat_id,imagine())
-        bot.send_message(chat_id,"Чтобы вернуться в начало напишите команду /teacher")
-
+        bot.send_message(chat_id,"Чтобы вернуться в начало напишите команду /start")
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        bug = types.InlineKeyboardButton('Да, еще раз!',callback_data='bug')
+        markup.add(bug)
+        bot.send_message(call.chat.id,"Еще разок?",reply_markup=markup)
+            
+        @bot.message_handler(content_types=['text'])
+        def outer(message): 
+            if message.text == "Да, еще раз!":
+                    
+                bot.register_next_step_handler(message,teacher_day)
+            elif message.text == '/start':
+                bot.register_next_step_handler(message,select)
     
 
 @bot.callback_query_handler(func=lambda call:True)
@@ -390,9 +404,17 @@ def callback(call):
                 elif message.text == '/admin':
                     bot.send_message(call.chat.id,"Введите команду /admin")
                     bot.register_next_step_handler(message,admin)
+                elif message.text == "/teacher":
+                    bot.send_message(call.chat.id,"Введите команду /teacher")
+                    bot.register_next_step_handler(message,teacher_day)
 
 
 
         
 if __name__ =="__main__":
-    bot.polling(none_stop=True, interval = 5)  
+    while True:
+        try:
+            bot.polling(none_stop=True)
+        except Exception as _ex:
+            print(_ex)
+            sleep(15) 
