@@ -2,6 +2,7 @@ import pandas as pd
 import openpyxl
 import numpy as np
 from googletrans import Translator, constants
+from numpy import nan
 
 a = ''
 password = 'Oksanakoren'
@@ -23,16 +24,19 @@ def slicer(n,path):
     op = pd.read_excel(func_const(path))
     
     #return print(op.iloc[:, :n+1])
-     
+    print(op.head())
     new_op = pd.DataFrame(op, columns=["Урок",n])
     temp_op = new_op
+    print(temp_op)
     result =[]
     for index in temp_op.index:
         y = temp_op['Урок'][index], temp_op[n][index]
-        if y != 'Nan':
-            result.append(y)
+        #y = [x for x in y[n][index] if str(x) != 'nan']
+
+        result.append(y)
+    new = [i for i in result if nan not in i]
     #result.insert(0,("Урок","Предмет"))
-    return result
+    return new
 def imagine():
     res = []
     citates = pd.read_excel("quotes_ex.xlsx")
@@ -57,8 +61,7 @@ def slicer_teach(n,path):
         result_name.append(res)
     
     return result_name
-    
-
+print(slicer('10A','Четверг'))
        
 
 
