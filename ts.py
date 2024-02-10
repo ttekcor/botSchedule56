@@ -4,6 +4,7 @@ import numpy as np
 from googletrans import Translator, constants
 from numpy import nan
 
+
 a = ''
 password = 'Oksanakoren'
 token = '5895426188:AAGeesw_OVKurBcmJaNv-aUJ46t0vwYhx7M'#настоящий
@@ -63,5 +64,5 @@ def slicer_teach(n,path):
     return result_name
        
 
-
+#print(slicer_teach("Паранько","Четверг"))
 
