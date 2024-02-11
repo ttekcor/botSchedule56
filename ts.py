@@ -28,7 +28,7 @@ def slicer(n,path):
     
     new_op = pd.DataFrame(op, columns=["Урок",n])
     temp_op = new_op
-    
+    print(temp_op)
     result =[]
     for index in temp_op.index:
         y = temp_op['Урок'][index], temp_op[n][index]
@@ -65,4 +65,5 @@ def slicer_teach(n,path):
        
 
 
+#print(slicer("7А","Понедельник"))
 

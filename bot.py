@@ -43,7 +43,7 @@ def day(message):
         global day_of_week  
         day_of_week = message.text
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        id7a = types.InlineKeyboardButton('7A',callback_data='7A')
+        id7a = types.InlineKeyboardButton('7А',callback_data='7А')
         id7b = types.InlineKeyboardButton('7Б',callback_data='7b')
         id7v = types.InlineKeyboardButton('7В',callback_data='7v')
         id7g = types.InlineKeyboardButton('7Г',callback_data='7g')
@@ -64,11 +64,6 @@ def day(message):
         
         bot.send_message(message.chat.id,'Класс:',reply_markup=markup)
         bot.register_next_step_handler(message, callback) 
-    elif message.text == "Да, еще раз!":
-        bot.send_message(message.chat.id,'Точно?')
-        bot.register_next_step_handler(message,start)
-    elif message.text == "/start":
-        bot.register_next_step_handler(message, select)
     else:  
         markup1 = types.ReplyKeyboardMarkup(row_width=3) 
         er_or = types.InlineKeyboardButton('Заново',callback_data='repeat')
@@ -283,9 +278,9 @@ def callback_teacher(call):
 def callback(call):
         if call:
             #print(call.text)
-            if call.text == '7A':
+            if call.text == '7А':
                 chat_id = call.chat.id
-                bot.send_message(chat_id,"7A")
+                bot.send_message(chat_id,"7А")
                 for _,text in slicer(call.text,day_of_week):
                     
                     res = str(_) + " " + str(text)
@@ -395,23 +390,17 @@ def callback(call):
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
                 bot.send_message(chat_id,imagine())
-            markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            bug1 = types.InlineKeyboardButton('Да, еще раз!',callback_data='bug1')
-            markup.add(bug1)
-            bot.send_message(chat_id,"Чтобы вернуться в начало напишите команду /start")
-            bot.send_message(call.chat.id,"Еще разок?",reply_markup=markup)
-            
-            @bot.message_handler(content_types=['text'])
-            def outer(message): 
-                if message.text == "Да, еще раз!":
-                    
-                    bot.register_next_step_handler(message,start)
-                elif message.text == '/admin':
-                    bot.send_message(call.chat.id,"Введите команду /admin")
-                    bot.register_next_step_handler(message,admin)
-                elif message.text == "/teacher":
-                    bot.send_message(call.chat.id,"Введите команду /teacher")
-                    bot.register_next_step_handler(message,teacher_day)
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        bug1 = types.InlineKeyboardButton('Да, еще разок!',callback_data='bug1')
+        markup.add(bug1)
+        bot.send_message(chat_id,"Чтобы вернуться в начало напишите команду /start")
+        bot.register_next_step_handler(call,select)
+                # elif message.text == '/admin':
+                #     bot.send_message(call.chat.id,"Введите команду /admin")
+                #     bot.register_next_step_handler(message,admin)
+                # elif message.text == "/teacher":
+                #     bot.send_message(call.chat.id,"Введите команду /teacher")
+                #     bot.register_next_step_handler(message,teacher_day)
 
 
 
