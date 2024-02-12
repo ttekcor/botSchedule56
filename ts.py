@@ -3,12 +3,31 @@ import openpyxl
 import numpy as np
 from googletrans import Translator, constants
 from numpy import nan
+#current_date_pn,current_date_vt,current_date_sr,current_date_cht,current_date_pt
+
 
 
 a = ''
 password = 'Oksanakoren'
 token = '5895426188:AAGeesw_OVKurBcmJaNv-aUJ46t0vwYhx7M'#настоящий
 #token = '6779562330:AAE_d_QKj1n59lgJU_JT6s6PO4atUMlnUcM'
+def actual(n,m):
+    match n:
+        case 'Понедельник': 
+            if m[0]!="": return r'Это расписание было обновлено '+ str(m[0]) 
+            else: return r'Это расписание не обновлено '
+        case 'Вторник': 
+            if m[1]!="": return r'Это расписание было обновлено '+ str(m[1]) 
+            else: return r'Это расписание не обновлено '
+        case 'Среда': 
+            if m[2]!="": return r'Это расписание было обновлено '+ str(m[2]) 
+            else: return r'Это расписание не обновлено '
+        case 'Четверг': 
+            if m[3]!="": return r'Это расписание было обновлено '+ str(m[3]) 
+            else: return r'Это расписание не обновлено '
+        case 'Пятница': 
+            if m[4]!="": return r'Это расписание было обновлено '+ str(m[4]) 
+            else: return r'Это расписание не обновлено '
 def func_const(n):
     a = separator(n)
     return a
@@ -45,7 +64,7 @@ def imagine():
     y = citates.take(np.random.permutation(len(citates))[:1])
     for index in y.index:
         res = y['Author'][index],y['Quote'][index]
-    result = ",".join(res)
+    result = ", ".join(res)
     return result
 
 def slicer_teach(n,path):
@@ -65,5 +84,5 @@ def slicer_teach(n,path):
        
 
 
-#print(slicer("7А","Понедельник"))
+#print(slicer_teach("Паранько","Понедельник"))
 
