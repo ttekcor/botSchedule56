@@ -5,16 +5,19 @@ import pandas as pd
 from ts import slicer,imagine,token,password,slicer_teach,actual
 from time import sleep
 import datetime 
+import pytz
 
 
 bot = telebot.TeleBot(token)
 day_of_week = ""
-
+tz = pytz.timezone('Asia/Vladivostok')
+obj = tz.localize(datetime.datetime.today()).weekday()
+ 
 
 week_d = ["Понедельник","Вторник","Среда","Четверг","Пятница","Уроков нет","Уроков нет"]
 @bot.message_handler(commands=['start']) 
 def select(message):
-    full_name = f'Привет, <u>{message.from_user.first_name} {message.from_user.last_name}</u>,Сегодня <u>{week_d[datetime.datetime.today().weekday()]}</u>, выбери команду /day чтобы посмотреть расписание для ученика, или /teacher, чтобы посмотреть расписание для учителя .'
+    full_name = f'Привет, <u>{message.from_user.first_name} {message.from_user.last_name}</u>,Сегодня <u>{week_d[obj]}</u>, выбери команду /day чтобы посмотреть расписание для ученика, или /teacher, чтобы посмотреть расписание для учителя .'
     bot.send_message(message.chat.id, full_name, parse_mode='html')
 
 def day_week(message): 
@@ -187,7 +190,7 @@ def seq(message):
     if message.text=="Понедельник!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_pn.xlsx'
-        current_date[0] = datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M')
+        current_date[0] = tz.localize(datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M'))
         print(current_date) 
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
@@ -197,7 +200,7 @@ def seq(message):
     
     elif message.text=="Вторник!":
         downloaded_file = bot.download_file(file_info.file_path)
-        current_date[1] = datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M')
+        current_date[1] = tz.localize(datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M'))
         src = r'sch_vt.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
@@ -208,7 +211,7 @@ def seq(message):
     elif message.text=="Среда!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_sr.xlsx'
-        current_date[2] = datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M')
+        current_date[2] = tz.localize(datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M'))
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_sr.xlsx bot:/sch_sr.xlsx')
@@ -218,7 +221,7 @@ def seq(message):
     elif message.text=="Четверг!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_cht.xlsx'
-        current_date[3] = datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M')
+        current_date[3] = tz.localize(datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M'))
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_cht.xlsx bot:/sch_cht.xlsx')
@@ -228,7 +231,7 @@ def seq(message):
     elif message.text=="Пятница!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_pt.xlsx'
-        current_date[4] = datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M')
+        current_date[4] = tz.localize(datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M'))
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_pt.xlsx bot:/sch_pt.xlsx')
