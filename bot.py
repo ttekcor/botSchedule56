@@ -283,7 +283,7 @@ def callback_teacher(call):
             
             bot.send_message(chat_id,res)
         bot.send_message(chat_id,imagine())
-        bot.send_message(chat_id,actual(day_of_week))
+        bot.send_message(chat_id,actual(day_of_week,current_date))
         bot.send_message(chat_id,"Чтобы вернуться в начало напишите команду /start")
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         bug = types.InlineKeyboardButton('Да, еще раз!',callback_data='bug')
