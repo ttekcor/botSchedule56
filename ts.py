@@ -9,7 +9,7 @@ from numpy import nan
 
 a = ''
 password = 'Oksanakoren'
-token = '5895426188:AAGeesw_OVKurBcmJaNv-aUJ46t0vwYhx7M'#настоящий
+#token = '5895426188:AAGeesw_OVKurBcmJaNv-aUJ46t0vwYhx7M'#настоящий
 #token = '6779562330:AAE_d_QKj1n59lgJU_JT6s6PO4atUMlnUcM'
 def actual(n,m):
     match n:
@@ -47,7 +47,7 @@ def slicer(n,path):
     
     new_op = pd.DataFrame(op, columns=["Урок",n])
     temp_op = new_op
-    print(temp_op)
+    #print(temp_op)
     result =[]
     for index in temp_op.index:
         y = temp_op['Урок'][index], temp_op[n][index]

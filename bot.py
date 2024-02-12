@@ -187,16 +187,14 @@ def seq(message):
     if message.text=="Понедельник!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_pn.xlsx'
-
         current_date[0] = datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M')
         print(current_date) 
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_pn.xlsx bot:/sch_pn.xlsx')
-              
         bot.reply_to(message, f"Спасибо, сохранил! Актуально на {current_date[0]}")
         bot.register_next_step_handler(message,select)
-        
+    
     elif message.text=="Вторник!":
         downloaded_file = bot.download_file(file_info.file_path)
         current_date[1] = datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M')
@@ -206,6 +204,7 @@ def seq(message):
         os.system('docker cp sch_vt.xlsx bot:/sch_vt.xlsx')    
         bot.reply_to(message, f"Спасибо, сохранил! Актуально на {current_date[1]}")
         bot.register_next_step_handler(message,select)
+    
     elif message.text=="Среда!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_sr.xlsx'
@@ -215,6 +214,7 @@ def seq(message):
         os.system('docker cp sch_sr.xlsx bot:/sch_sr.xlsx')
         bot.reply_to(message, f"Спасибо, сохранил! Актуально на {current_date[2]}")
         bot.register_next_step_handler(message,select)
+    
     elif message.text=="Четверг!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_cht.xlsx'
@@ -224,6 +224,7 @@ def seq(message):
         os.system('docker cp sch_cht.xlsx bot:/sch_cht.xlsx')
         bot.reply_to(message, f"Спасибо, сохранил! Актуально на {current_date[3]}")
         bot.register_next_step_handler(message,select)
+    
     elif message.text=="Пятница!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_pt.xlsx'
