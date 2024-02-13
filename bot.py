@@ -78,8 +78,8 @@ def day(message):
         # markup1 = types.ReplyKeyboardMarkup(row_width=3) 
         # er_or = types.InlineKeyboardButton('Заново',callback_data='repeat')
         # markup1.add(er_or)
-        bot.send_message(message.chat.id,"Неверно введен день недели, введите комамнду /day ")
-        bot.register_next_step_handler(message,day_week)
+        bot.send_message(message.chat.id,"Неверно введен день недели, введите команду /day ")
+        bot.register_next_step_handler(message,select)
             
 @bot.message_handler(commands=['teacher'])  
 def teacher_day(message):
@@ -144,20 +144,23 @@ def teacher_erorr(message):
 
 @bot.message_handler(commands=['admin']) 
 def admin(message):
-    bot.send_message(message.chat.id,'Введите пароль:')
-    @bot.message_handler(content_types=['text'])
-    def check(message):
-        if message.text == password:
-            bot.reply_to(message,"Успешно")
-            bot.reply_to(message,"Загрузите файл")
-            bot.register_next_step_handler(message,handle_docs_audio)
-            bot.register_next_step_handler(message,day_admin)
-        else:
-            bot.send_message(message.chat.id,'Неверный пароль')
-            bot.register_next_step_handler(message,admin)
+    if message.text!='/admin':
+        bot.register_next_step_handler(message,select)
+    else:
+        bot.send_message(message.chat.id,'Введите пароль:')
+        @bot.message_handler(content_types=['text'])
+        def check(message):
+            if message.text == password:
+                bot.reply_to(message,"Успешно")
+                bot.reply_to(message,"Загрузите файл")
+                bot.register_next_step_handler(message,handle_docs_audio)
+                bot.register_next_step_handler(message,day_admin)
+            else:
+                bot.send_message(message.chat.id,'Неверный пароль')
+                bot.register_next_step_handler(message,admin)
+            
         
-    
-    bot.register_next_step_handler(message,check)
+        bot.register_next_step_handler(message,check)
 
 
 @bot.message_handler(content_types=['admin'])
