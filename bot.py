@@ -12,7 +12,7 @@ bot = telebot.TeleBot(token)
 day_of_week = ""
 tz = pytz.timezone('Asia/Vladivostok')
 obj = tz.localize(datetime.datetime.today()).weekday()
- 
+print(tz,obj)
 
 week_d = ["Понедельник","Вторник","Среда","Четверг","Пятница","Уроков нет","Уроков нет"]
 @bot.message_handler(commands=['start']) 
@@ -200,7 +200,8 @@ def seq(message):
     
     elif message.text=="Вторник!":
         downloaded_file = bot.download_file(file_info.file_path)
-        current_date[1] = tz.localize(datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M'))
+        obj2 = tz.localize(datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M'))
+        current_date[1] = obj2
         src = r'sch_vt.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
