@@ -5,16 +5,22 @@ import pandas as pd
 from ts import slicer,imagine,token,password,slicer_teach,actual
 from time import sleep
 import datetime 
+from datetime import date
+import pytz
+from dateutil.tz import gettz
 
 
-bot = telebot.TeleBot(token)
+bot = telebot.TeleBot('1771064619:AAEiP3XGpTL1JVdxBcSjBcvPHZx14A0IJRU')
 day_of_week = ""
 
+obj = datetime.datetime.now(gettz("Asia/Vladivostok"))
+obj = obj.weekday()
+ 
 
 week_d = ["Понедельник","Вторник","Среда","Четверг","Пятница","Уроков нет","Уроков нет"]
 @bot.message_handler(commands=['start']) 
 def select(message):
-    full_name = f'Привет, <u>{message.from_user.first_name} {message.from_user.last_name}</u>,Сегодня <u>{week_d[datetime.datetime.today().weekday()]}</u>, выбери команду /day чтобы посмотреть расписание для ученика, или /teacher, чтобы посмотреть расписание для учителя .'
+    full_name = f'Привет, <u>{message.from_user.first_name} {message.from_user.last_name}</u>,Сегодня <u>{week_d[obj]}</u>, выбери команду /day чтобы посмотреть расписание для ученика, или /teacher, чтобы посмотреть расписание для учителя .'
     bot.send_message(message.chat.id, full_name, parse_mode='html')
 
 def day_week(message): 
@@ -47,7 +53,7 @@ def day(message):
         global day_of_week  
         day_of_week = message.text
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        id7a = types.InlineKeyboardButton('7А',callback_data='7А')
+        id7a = types.InlineKeyboardButton('7A',callback_data='7A')
         id7b = types.InlineKeyboardButton('7Б',callback_data='7b')
         id7v = types.InlineKeyboardButton('7В',callback_data='7v')
         id7g = types.InlineKeyboardButton('7Г',callback_data='7g')
@@ -187,8 +193,8 @@ def seq(message):
     if message.text=="Понедельник!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_pn.xlsx'
-        current_date[0] = datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M')
-        print(current_date) 
+        current_date[0] = datetime.datetime.now(gettz("Asia/Vladivostok")).strftime('%d, %b, %Y, в %H:%M')
+         
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_pn.xlsx bot:/sch_pn.xlsx')
@@ -197,7 +203,8 @@ def seq(message):
     
     elif message.text=="Вторник!":
         downloaded_file = bot.download_file(file_info.file_path)
-        current_date[1] = datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M')
+        current_date[1] = datetime.datetime.now(gettz("Asia/Vladivostok")).strftime('%d, %b, %Y, в %H:%M')
+        
         src = r'sch_vt.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
@@ -208,7 +215,7 @@ def seq(message):
     elif message.text=="Среда!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_sr.xlsx'
-        current_date[2] = datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M')
+        current_date[2] = datetime.datetime.now(gettz("Asia/Vladivostok")).strftime('%d, %b, %Y, в %H:%M')
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_sr.xlsx bot:/sch_sr.xlsx')
@@ -218,7 +225,7 @@ def seq(message):
     elif message.text=="Четверг!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_cht.xlsx'
-        current_date[3] = datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M')
+        current_date[3] = datetime.datetime.now(gettz("Asia/Vladivostok")).strftime('%d, %b, %Y, в %H:%M')
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_cht.xlsx bot:/sch_cht.xlsx')
@@ -228,7 +235,7 @@ def seq(message):
     elif message.text=="Пятница!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_pt.xlsx'
-        current_date[4] = datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M')
+        current_date[4] = datetime.datetime.now(gettz("Asia/Vladivostok")).strftime('%d, %b, %Y, в %H:%M')
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_pt.xlsx bot:/sch_pt.xlsx')
@@ -283,29 +290,22 @@ def callback_teacher(call):
             
             bot.send_message(chat_id,res)
         bot.send_message(chat_id,imagine())
-        bot.send_message(chat_id,actual(day_of_week,current_date))
+        bot.send_message(chat_id,actual(day_of_week,current_date),parse_mode='MarkdownV2')
         bot.send_message(chat_id,"Чтобы вернуться в начало напишите команду /start")
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         bug = types.InlineKeyboardButton('Да, еще раз!',callback_data='bug')
         markup.add(bug)
         bot.send_message(call.chat.id,"Еще разок?",reply_markup=markup)
-            
-        @bot.message_handler(content_types=['text'])
-        def outer(message): 
-            if message.text == "Да, еще раз!":
-                    
-                bot.register_next_step_handler(message,teacher_day)
-            elif message.text == '/start':
-                bot.register_next_step_handler(message,select)
+        bot.register_next_step_handler(call,select)
     
 
 @bot.callback_query_handler(func=lambda call:True)
 def callback(call):
         if call:
             #print(call.text)
-            if call.text == '7А':
+            if call.text == '7A':
                 chat_id = call.chat.id
-                bot.send_message(chat_id,"7А")
+                bot.send_message(chat_id,"7A")
                 for _,text in slicer(call.text,day_of_week):
                     
                     res = str(_) + " " + str(text)
@@ -428,7 +428,7 @@ def callback(call):
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
                 bot.send_message(chat_id,imagine())
-                bot.send_message(chat_id,actual(day_of_week,current_date))
+                bot.send_message(chat_id,actual(day_of_week,current_date),parse_mode='MarkdownV2')
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         bug1 = types.InlineKeyboardButton('Да, еще разок!',callback_data='bug1')
         markup.add(bug1)
