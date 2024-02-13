@@ -10,7 +10,7 @@ import pytz
 from dateutil.tz import gettz
 
 
-bot = telebot.TeleBot('1771064619:AAEiP3XGpTL1JVdxBcSjBcvPHZx14A0IJRU')
+bot = telebot.TeleBot(token)
 day_of_week = ""
 
 obj = datetime.datetime.now(gettz("Asia/Vladivostok"))
