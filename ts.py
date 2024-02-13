@@ -9,8 +9,8 @@ from numpy import nan
 
 a = ''
 password = 'Oksanakoren'
-token = '5895426188:AAGeesw_OVKurBcmJaNv-aUJ46t0vwYhx7M'#настоящий
-#token = '6779562330:AAE_d_QKj1n59lgJU_JT6s6PO4atUMlnUcM'
+#token = '5895426188:AAGeesw_OVKurBcmJaNv-aUJ46t0vwYhx7M'#настоящий
+token = '6779562330:AAE_d_QKj1n59lgJU_JT6s6PO4atUMlnUcM'
 def actual(n,m):
     match n:
         case 'Понедельник': 
@@ -36,7 +36,7 @@ def separator(n):
         case 'Понедельник': return r'sch_pn.xlsx'
         case 'Вторник': return r'sch_vt.xlsx'
         case 'Среда': return r'sch_sr.xlsx'
-        case 'Четверг': return r'sch_chtg.xlsx'
+        case 'Четверг': return r'sch_cht.xlsx'
         case 'Пятница': return r'sch_pt.xlsx' 
 #
     
