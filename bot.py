@@ -10,7 +10,7 @@ import pytz
 from dateutil.tz import gettz
 
 
-bot = telebot.TeleBot(token)
+bot = telebot.TeleBot('1771064619:AAEiP3XGpTL1JVdxBcSjBcvPHZx14A0IJRU')
 day_of_week = ""
 
 obj = datetime.datetime.now(gettz("Asia/Vladivostok"))
@@ -292,13 +292,9 @@ def callback_teacher(call):
             res = str(_) + " " + str(text[:-2])
             
             bot.send_message(chat_id,res)
-        bot.send_message(chat_id,imagine())
-        bot.send_message(chat_id,actual(day_of_week,current_date),parse_mode='MarkdownV2')
+        bot.send_message(chat_id,f'<tg-spoiler>{imagine()}</tg-spoiler>',parse_mode='html')
+        bot.send_message(chat_id,actual(day_of_week,current_date))
         bot.send_message(chat_id,"Чтобы вернуться в начало напишите команду /start")
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        bug = types.InlineKeyboardButton('Да, еще раз!',callback_data='bug')
-        markup.add(bug)
-        bot.send_message(call.chat.id,"Еще разок?",reply_markup=markup)
         bot.register_next_step_handler(call,select)
     
 
@@ -313,7 +309,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '7Б':
                 chat_id = call.chat.id
@@ -322,7 +318,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '7В':
                 chat_id = call.chat.id
@@ -331,7 +327,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '7Г':
                 chat_id = call.chat.id
@@ -340,7 +336,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '8A':
                 chat_id = call.chat.id
@@ -349,7 +345,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '8Б':
                 chat_id = call.chat.id
@@ -358,7 +354,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '8В':
                 chat_id = call.chat.id
@@ -367,7 +363,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '8Г':
                 chat_id = call.chat.id
@@ -376,7 +372,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '9А':
                 chat_id = call.chat.id
@@ -385,7 +381,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '9Б':
                 chat_id = call.chat.id
@@ -394,7 +390,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '9B':
                 chat_id = call.chat.id
@@ -403,7 +399,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '10A':
                 chat_id = call.chat.id
@@ -412,7 +408,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date)) 
             elif call.text == '10Б':
                 chat_id = call.chat.id
@@ -421,7 +417,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date)) 
             elif call.text == '11А':
                 chat_id = call.chat.id
@@ -430,19 +426,14 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
-                bot.send_message(chat_id,actual(day_of_week,current_date),parse_mode='MarkdownV2')
+                
+                bot.send_message(chat_id,actual(day_of_week,current_date))
+            bot.send_message(chat_id,f'<tg-spoiler>{imagine()}</tg-spoiler>',parse_mode='html')
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         bug1 = types.InlineKeyboardButton('Да, еще разок!',callback_data='bug1')
         markup.add(bug1)
         bot.send_message(chat_id,"Чтобы вернуться в начало напишите команду /start")
         bot.register_next_step_handler(call,select)
-                # elif message.text == '/admin':
-                #     bot.send_message(call.chat.id,"Введите команду /admin")
-                #     bot.register_next_step_handler(message,admin)
-                # elif message.text == "/teacher":
-                #     bot.send_message(call.chat.id,"Введите команду /teacher")
-                #     bot.register_next_step_handler(message,teacher_day)
 
 
 
