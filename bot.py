@@ -5,14 +5,17 @@ import pandas as pd
 from ts import slicer,imagine,token,password,slicer_teach,actual
 from time import sleep
 import datetime 
+from datetime import date
 import pytz
+from dateutil.tz import gettz
 
 
-bot = telebot.TeleBot(token)
+bot = telebot.TeleBot('1771064619:AAEiP3XGpTL1JVdxBcSjBcvPHZx14A0IJRU')
 day_of_week = ""
-tz = pytz.timezone('Asia/Vladivostok')
-obj = tz.localize(datetime.datetime.today()).weekday()
-print(tz,obj)
+
+obj = datetime.datetime.now(gettz("Asia/Vladivostok"))
+obj = obj.weekday()
+ 
 
 week_d = ["Понедельник","Вторник","Среда","Четверг","Пятница","Уроков нет","Уроков нет"]
 @bot.message_handler(commands=['start']) 
@@ -50,7 +53,7 @@ def day(message):
         global day_of_week  
         day_of_week = message.text
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        id7a = types.InlineKeyboardButton('7А',callback_data='7А')
+        id7a = types.InlineKeyboardButton('7A',callback_data='7A')
         id7b = types.InlineKeyboardButton('7Б',callback_data='7b')
         id7v = types.InlineKeyboardButton('7В',callback_data='7v')
         id7g = types.InlineKeyboardButton('7Г',callback_data='7g')
@@ -75,8 +78,8 @@ def day(message):
         # markup1 = types.ReplyKeyboardMarkup(row_width=3) 
         # er_or = types.InlineKeyboardButton('Заново',callback_data='repeat')
         # markup1.add(er_or)
-        bot.send_message(message.chat.id,"Неверно введен день недели, введите комамнду /day ")
-        bot.register_next_step_handler(message,day_week)
+        bot.send_message(message.chat.id,"Неверно введен день недели, введите команду /day ")
+        bot.register_next_step_handler(message,select)
             
 @bot.message_handler(commands=['teacher'])  
 def teacher_day(message):
@@ -141,20 +144,23 @@ def teacher_erorr(message):
 
 @bot.message_handler(commands=['admin']) 
 def admin(message):
-    bot.send_message(message.chat.id,'Введите пароль:')
-    @bot.message_handler(content_types=['text'])
-    def check(message):
-        if message.text == password:
-            bot.reply_to(message,"Успешно")
-            bot.reply_to(message,"Загрузите файл")
-            bot.register_next_step_handler(message,handle_docs_audio)
-            bot.register_next_step_handler(message,day_admin)
-        else:
-            bot.send_message(message.chat.id,'Неверный пароль')
-            bot.register_next_step_handler(message,admin)
+    if message.text!='/admin':
+        bot.register_next_step_handler(message,select)
+    else:
+        bot.send_message(message.chat.id,'Введите пароль:')
+        @bot.message_handler(content_types=['text'])
+        def check(message):
+            if message.text == password:
+                bot.reply_to(message,"Успешно")
+                bot.reply_to(message,"Загрузите файл")
+                bot.register_next_step_handler(message,handle_docs_audio)
+                bot.register_next_step_handler(message,day_admin)
+            else:
+                bot.send_message(message.chat.id,'Неверный пароль')
+                bot.register_next_step_handler(message,admin)
+            
         
-    
-    bot.register_next_step_handler(message,check)
+        bot.register_next_step_handler(message,check)
 
 
 @bot.message_handler(content_types=['admin'])
@@ -190,8 +196,8 @@ def seq(message):
     if message.text=="Понедельник!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_pn.xlsx'
-        current_date[0] = tz.localize(datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M'))
-        print(current_date) 
+        current_date[0] = datetime.datetime.now(gettz("Asia/Vladivostok")).strftime('%d, %b, %Y, в %H:%M')
+         
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_pn.xlsx bot:/sch_pn.xlsx')
@@ -200,8 +206,8 @@ def seq(message):
     
     elif message.text=="Вторник!":
         downloaded_file = bot.download_file(file_info.file_path)
-        obj2 = tz.localize(datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M'))
-        current_date[1] = obj2
+        current_date[1] = datetime.datetime.now(gettz("Asia/Vladivostok")).strftime('%d, %b, %Y, в %H:%M')
+        
         src = r'sch_vt.xlsx'
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
@@ -212,7 +218,7 @@ def seq(message):
     elif message.text=="Среда!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_sr.xlsx'
-        current_date[2] = tz.localize(datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M'))
+        current_date[2] = datetime.datetime.now(gettz("Asia/Vladivostok")).strftime('%d, %b, %Y, в %H:%M')
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_sr.xlsx bot:/sch_sr.xlsx')
@@ -222,7 +228,7 @@ def seq(message):
     elif message.text=="Четверг!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_cht.xlsx'
-        current_date[3] = tz.localize(datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M'))
+        current_date[3] = datetime.datetime.now(gettz("Asia/Vladivostok")).strftime('%d, %b, %Y, в %H:%M')
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_cht.xlsx bot:/sch_cht.xlsx')
@@ -232,7 +238,7 @@ def seq(message):
     elif message.text=="Пятница!":
         downloaded_file = bot.download_file(file_info.file_path)
         src = r'sch_pt.xlsx'
-        current_date[4] = tz.localize(datetime.datetime.now().strftime('%d, %b, %Y, в %H:%M'))
+        current_date[4] = datetime.datetime.now(gettz("Asia/Vladivostok")).strftime('%d, %b, %Y, в %H:%M')
         with open(src, 'wb') as new_file:
             new_file.write(downloaded_file)
         os.system('docker cp sch_pt.xlsx bot:/sch_pt.xlsx')
@@ -286,35 +292,24 @@ def callback_teacher(call):
             res = str(_) + " " + str(text[:-2])
             
             bot.send_message(chat_id,res)
-        bot.send_message(chat_id,imagine())
+        bot.send_message(chat_id,f'<tg-spoiler>{imagine()}</tg-spoiler>',parse_mode='html')
         bot.send_message(chat_id,actual(day_of_week,current_date))
         bot.send_message(chat_id,"Чтобы вернуться в начало напишите команду /start")
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        bug = types.InlineKeyboardButton('Да, еще раз!',callback_data='bug')
-        markup.add(bug)
-        bot.send_message(call.chat.id,"Еще разок?",reply_markup=markup)
-            
-        @bot.message_handler(content_types=['text'])
-        def outer(message): 
-            if message.text == "Да, еще раз!":
-                    
-                bot.register_next_step_handler(message,teacher_day)
-            elif message.text == '/start':
-                bot.register_next_step_handler(message,select)
+        bot.register_next_step_handler(call,select)
     
 
 @bot.callback_query_handler(func=lambda call:True)
 def callback(call):
         if call:
             #print(call.text)
-            if call.text == '7А':
+            if call.text == '7A':
                 chat_id = call.chat.id
-                bot.send_message(chat_id,"7А")
+                bot.send_message(chat_id,"7A")
                 for _,text in slicer(call.text,day_of_week):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '7Б':
                 chat_id = call.chat.id
@@ -323,7 +318,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '7В':
                 chat_id = call.chat.id
@@ -332,7 +327,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '7Г':
                 chat_id = call.chat.id
@@ -341,7 +336,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '8A':
                 chat_id = call.chat.id
@@ -350,7 +345,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '8Б':
                 chat_id = call.chat.id
@@ -359,7 +354,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '8В':
                 chat_id = call.chat.id
@@ -368,7 +363,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '8Г':
                 chat_id = call.chat.id
@@ -377,7 +372,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '9А':
                 chat_id = call.chat.id
@@ -386,7 +381,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '9Б':
                 chat_id = call.chat.id
@@ -395,7 +390,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '9B':
                 chat_id = call.chat.id
@@ -404,7 +399,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '10A':
                 chat_id = call.chat.id
@@ -413,7 +408,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date)) 
             elif call.text == '10Б':
                 chat_id = call.chat.id
@@ -422,7 +417,7 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date)) 
             elif call.text == '11А':
                 chat_id = call.chat.id
@@ -431,19 +426,14 @@ def callback(call):
                     
                     res = str(_) + " " + str(text)
                     bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
+            bot.send_message(chat_id,f'<tg-spoiler>{imagine()}</tg-spoiler>',parse_mode='html')
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         bug1 = types.InlineKeyboardButton('Да, еще разок!',callback_data='bug1')
         markup.add(bug1)
         bot.send_message(chat_id,"Чтобы вернуться в начало напишите команду /start")
         bot.register_next_step_handler(call,select)
-                # elif message.text == '/admin':
-                #     bot.send_message(call.chat.id,"Введите команду /admin")
-                #     bot.register_next_step_handler(message,admin)
-                # elif message.text == "/teacher":
-                #     bot.send_message(call.chat.id,"Введите команду /teacher")
-                #     bot.register_next_step_handler(message,teacher_day)
 
 
 

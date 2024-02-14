@@ -36,7 +36,7 @@ def separator(n):
         case 'Понедельник': return r'sch_pn.xlsx'
         case 'Вторник': return r'sch_vt.xlsx'
         case 'Среда': return r'sch_sr.xlsx'
-        case 'Четверг': return r'sch_chtg.xlsx'
+        case 'Четверг': return r'sch_cht.xlsx'
         case 'Пятница': return r'sch_pt.xlsx' 
 #
     
