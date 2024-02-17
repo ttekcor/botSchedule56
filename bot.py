@@ -13,13 +13,14 @@ from dateutil.tz import gettz
 bot = telebot.TeleBot('1771064619:AAEiP3XGpTL1JVdxBcSjBcvPHZx14A0IJRU')
 day_of_week = ""
 
-obj = datetime.datetime.now(gettz("Asia/Vladivostok"))
-obj = obj.weekday()
+
  
 
 week_d = ["Понедельник","Вторник","Среда","Четверг","Пятница","Уроков нет","Уроков нет"]
 @bot.message_handler(commands=['start']) 
 def select(message):
+    obj = datetime.datetime.now(gettz("Asia/Vladivostok"))
+    obj = obj.weekday()
     full_name = f'Привет, <u>{message.from_user.first_name} {message.from_user.last_name}</u>,Сегодня <u>{week_d[obj]}</u>, выбери команду /day чтобы посмотреть расписание для ученика, или /teacher, чтобы посмотреть расписание для учителя .'
     bot.send_message(message.chat.id, full_name, parse_mode='html')
 
