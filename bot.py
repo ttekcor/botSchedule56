@@ -10,7 +10,7 @@ import pytz
 from dateutil.tz import gettz
 
 
-bot = telebot.TeleBot('1771064619:AAEiP3XGpTL1JVdxBcSjBcvPHZx14A0IJRU')
+bot = telebot.TeleBot(token)
 day_of_week = ""
 
 
@@ -288,11 +288,12 @@ def callback_teacher(call):
             case 'Степаненко': lastname = 'Степаненко'
         chat_id = call.chat.id
         bot.send_message(chat_id,lastname)
-        for _,text in slicer_teach(call.text,day_of_week):
-             
-            res = str(_) + " " + str(text[:-2])
-            
-            bot.send_message(chat_id,res)
+        if slicer_teach(call.text,day_of_week) == []:
+            bot.send_message(chat_id,"Уроков нет")
+        else:
+            for _,text in slicer_teach(call.text,day_of_week):
+                    res = str(_) + " " + str(text[:-2])
+                    bot.send_message(chat_id,res)
         bot.send_message(chat_id,f'<tg-spoiler>{imagine()}</tg-spoiler>',parse_mode='html')
         bot.send_message(chat_id,actual(day_of_week,current_date))
         bot.send_message(chat_id,"Чтобы вернуться в начало напишите команду /start")
