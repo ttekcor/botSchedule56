@@ -3,7 +3,7 @@ import openpyxl
 import numpy as np
 from googletrans import Translator, constants
 from numpy import nan
-#current_date_pn,current_date_vt,current_date_sr,current_date_cht,current_date_pt
+#curent_date_pn,current_date_vt,current_date_sr,current_date_cht,current_date_pt
 
 
 
