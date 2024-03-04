@@ -8,18 +8,17 @@ import datetime
 from datetime import date
 import pytz
 from dateutil.tz import gettz
+from numpy import nan
 
 
-bot = telebot.TeleBot('1771064619:AAEiP3XGpTL1JVdxBcSjBcvPHZx14A0IJRU')
+bot = telebot.TeleBot(token)
 day_of_week = ""
 
-obj = datetime.datetime.now(gettz("Asia/Vladivostok"))
-obj = obj.weekday()
- 
-
-week_d = ["Понедельник","Вторник","Среда","Четверг","Пятница","Уроков нет","Уроков нет"]
+week_d = ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"]
 @bot.message_handler(commands=['start']) 
 def select(message):
+    obj = datetime.datetime.now(gettz("Asia/Vladivostok"))
+    obj = obj.weekday()
     full_name = f'Привет, <u>{message.from_user.first_name} {message.from_user.last_name}</u>,Сегодня <u>{week_d[obj]}</u>, выбери команду /day чтобы посмотреть расписание для ученика, или /teacher, чтобы посмотреть расписание для учителя .'
     bot.send_message(message.chat.id, full_name, parse_mode='html')
 
@@ -78,8 +77,8 @@ def day(message):
         # markup1 = types.ReplyKeyboardMarkup(row_width=3) 
         # er_or = types.InlineKeyboardButton('Заново',callback_data='repeat')
         # markup1.add(er_or)
-        bot.send_message(message.chat.id,"Неверно введен день недели, введите комамнду /day ")
-        bot.register_next_step_handler(message,day_week)
+        bot.send_message(message.chat.id,"Неверно введен день недели, введите команду /day ")
+        bot.register_next_step_handler(message,select)
             
 @bot.message_handler(commands=['teacher'])  
 def teacher_day(message):
@@ -144,20 +143,23 @@ def teacher_erorr(message):
 
 @bot.message_handler(commands=['admin']) 
 def admin(message):
-    bot.send_message(message.chat.id,'Введите пароль:')
-    @bot.message_handler(content_types=['text'])
-    def check(message):
-        if message.text == password:
-            bot.reply_to(message,"Успешно")
-            bot.reply_to(message,"Загрузите файл")
-            bot.register_next_step_handler(message,handle_docs_audio)
-            bot.register_next_step_handler(message,day_admin)
-        else:
-            bot.send_message(message.chat.id,'Неверный пароль')
-            bot.register_next_step_handler(message,admin)
+    if message.text!='/admin':
+        bot.register_next_step_handler(message,select)
+    else:
+        bot.send_message(message.chat.id,'Введите пароль:')
+        @bot.message_handler(content_types=['text'])
+        def check(message):
+            if message.text == password:
+                bot.reply_to(message,"Успешно")
+                bot.reply_to(message,"Загрузите файл")
+                bot.register_next_step_handler(message,handle_docs_audio)
+                bot.register_next_step_handler(message,day_admin)
+            else:
+                bot.send_message(message.chat.id,'Неверный пароль')
+                bot.register_next_step_handler(message,admin)
+            
         
-    
-    bot.register_next_step_handler(message,check)
+        bot.register_next_step_handler(message,check)
 
 
 @bot.message_handler(content_types=['admin'])
@@ -284,18 +286,15 @@ def callback_teacher(call):
             case 'Степаненко': lastname = 'Степаненко'
         chat_id = call.chat.id
         bot.send_message(chat_id,lastname)
-        for _,text in slicer_teach(call.text,day_of_week):
-             
-            res = str(_) + " " + str(text[:-2])
-            
-            bot.send_message(chat_id,res)
-        bot.send_message(chat_id,imagine())
-        bot.send_message(chat_id,actual(day_of_week,current_date),parse_mode='MarkdownV2')
+        if slicer_teach(call.text,day_of_week) == []:
+            bot.send_message(chat_id,"Уроков нет")
+        else:
+            for _,text in slicer_teach(call.text,day_of_week):
+                    res = str(_) + " " + str(text[:-2])
+                    bot.send_message(chat_id,res)
+        bot.send_message(chat_id,f'<tg-spoiler>{imagine()}</tg-spoiler>',parse_mode='html')
+        bot.send_message(chat_id,actual(day_of_week,current_date))
         bot.send_message(chat_id,"Чтобы вернуться в начало напишите команду /start")
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        bug = types.InlineKeyboardButton('Да, еще раз!',callback_data='bug')
-        markup.add(bug)
-        bot.send_message(call.chat.id,"Еще разок?",reply_markup=markup)
         bot.register_next_step_handler(call,select)
     
 
@@ -306,140 +305,177 @@ def callback(call):
             if call.text == '7A':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"7A")
-                for _,text in slicer(call.text,day_of_week):
-                    
-                    res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                if str(slicer(call.text,day_of_week)) == "[(1, nan), (2, nan), (3, nan), (4, nan), (5, nan), (6, nan), (7, nan), ('8/0', nan), ('2.1', nan), ('2.2', nan), ('2.3', nan), ('2.4', nan), ('2.5', nan), ('2.6', nan), ('2.7', nan)]":
+                    bot.send_message(chat_id,"Уроков нет")
+                else:
+                    for _,text in slicer(call.text,day_of_week):
+                        
+                        res = str(_) + " " + str(text)
+                        bot.send_message(chat_id,res)
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '7Б':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"7Б")
-                for _,text in slicer(call.text,day_of_week):
-                    
-                    res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                if str(slicer(call.text,day_of_week)) == "[(1, nan), (2, nan), (3, nan), (4, nan), (5, nan), (6, nan), (7, nan), ('8/0', nan), ('2.1', nan), ('2.2', nan), ('2.3', nan), ('2.4', nan), ('2.5', nan), ('2.6', nan), ('2.7', nan)]":
+                    bot.send_message(chat_id,"Уроков нет")
+                else:
+                    for _,text in slicer(call.text,day_of_week):
+                        
+                        res = str(_) + " " + str(text)
+                        bot.send_message(chat_id,res)
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '7В':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"7В")
-                for _,text in slicer(call.text,day_of_week):
-                    
-                    res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                if str(slicer(call.text,day_of_week)) == "[(1, nan), (2, nan), (3, nan), (4, nan), (5, nan), (6, nan), (7, nan), ('8/0', nan), ('2.1', nan), ('2.2', nan), ('2.3', nan), ('2.4', nan), ('2.5', nan), ('2.6', nan), ('2.7', nan)]":
+                    bot.send_message(chat_id,"Уроков нет")
+                else:
+                    for _,text in slicer(call.text,day_of_week):
+                        
+                        res = str(_) + " " + str(text)
+                        bot.send_message(chat_id,res)
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '7Г':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"7Г")
-                for _,text in slicer(call.text,day_of_week):
-                    
-                    res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                if str(slicer(call.text,day_of_week)) == "[(1, nan), (2, nan), (3, nan), (4, nan), (5, nan), (6, nan), (7, nan), ('8/0', nan), ('2.1', nan), ('2.2', nan), ('2.3', nan), ('2.4', nan), ('2.5', nan), ('2.6', nan), ('2.7', nan)]":
+                    bot.send_message(chat_id,"Уроков нет")
+                else:
+                    for _,text in slicer(call.text,day_of_week):
+                        
+                        res = str(_) + " " + str(text)
+                        bot.send_message(chat_id,res)
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '8A':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"8A")
-                for _,text in slicer(call.text,day_of_week):
-                    
-                    res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                if str(slicer(call.text,day_of_week)) == "[(1, nan), (2, nan), (3, nan), (4, nan), (5, nan), (6, nan), (7, nan), ('8/0', nan), ('2.1', nan), ('2.2', nan), ('2.3', nan), ('2.4', nan), ('2.5', nan), ('2.6', nan), ('2.7', nan)]":
+                    bot.send_message(chat_id,"Уроков нет")
+                else:
+                    for _,text in slicer(call.text,day_of_week):
+                        
+                        res = str(_) + " " + str(text)
+                        bot.send_message(chat_id,res)
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '8Б':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"8Б")
-                for _,text in slicer(call.text,day_of_week):
-                    
-                    res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                if str(slicer(call.text,day_of_week)) == "[(1, nan), (2, nan), (3, nan), (4, nan), (5, nan), (6, nan), (7, nan), ('8/0', nan), ('2.1', nan), ('2.2', nan), ('2.3', nan), ('2.4', nan), ('2.5', nan), ('2.6', nan), ('2.7', nan)]":
+                    bot.send_message(chat_id,"Уроков нет")
+                else:
+                    for _,text in slicer(call.text,day_of_week):
+                        
+                        res = str(_) + " " + str(text)
+                        bot.send_message(chat_id,res)
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '8В':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"8В")
-                for _,text in slicer(call.text,day_of_week):
-                    
-                    res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
+                if str(slicer(call.text,day_of_week)) == "[(1, nan), (2, nan), (3, nan), (4, nan), (5, nan), (6, nan), (7, nan), ('8/0', nan), ('2.1', nan), ('2.2', nan), ('2.3', nan), ('2.4', nan), ('2.5', nan), ('2.6', nan), ('2.7', nan)]":
+                    bot.send_message(chat_id,"Уроков нет")
+                else:
+                    for _,text in slicer(call.text,day_of_week):
+                        
+                        res = str(_) + " " + str(text)
+                        bot.send_message(chat_id,res)
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '8Г':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"8Г")
-                for _,text in slicer(call.text,day_of_week):
-                    
-                    res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                if str(slicer(call.text,day_of_week)) == "[(1, nan), (2, nan), (3, nan), (4, nan), (5, nan), (6, nan), (7, nan), ('8/0', nan), ('2.1', nan), ('2.2', nan), ('2.3', nan), ('2.4', nan), ('2.5', nan), ('2.6', nan), ('2.7', nan)]":
+                    bot.send_message(chat_id,"Уроков нет")
+                else:
+                    for _,text in slicer(call.text,day_of_week):
+                        
+                        res = str(_) + " " + str(text)
+                        bot.send_message(chat_id,res)
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '9А':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"9А")
-                for _,text in slicer(call.text,day_of_week):
-                    
-                    res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                if str(slicer(call.text,day_of_week)) == "[(1, nan), (2, nan), (3, nan), (4, nan), (5, nan), (6, nan), (7, nan), ('8/0', nan), ('2.1', nan), ('2.2', nan), ('2.3', nan), ('2.4', nan), ('2.5', nan), ('2.6', nan), ('2.7', nan)]":
+                    bot.send_message(chat_id,"Уроков нет")
+                else:
+                    for _,text in slicer(call.text,day_of_week):
+                        
+                        res = str(_) + " " + str(text)
+                        bot.send_message(chat_id,res)
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '9Б':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"9Б")
-                for _,text in slicer(call.text,day_of_week):
-                    
-                    res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                if str(slicer(call.text,day_of_week)) == "[(1, nan), (2, nan), (3, nan), (4, nan), (5, nan), (6, nan), (7, nan), ('8/0', nan), ('2.1', nan), ('2.2', nan), ('2.3', nan), ('2.4', nan), ('2.5', nan), ('2.6', nan), ('2.7', nan)]":
+                    bot.send_message(chat_id,"Уроков нет")
+                else:
+                    for _,text in slicer(call.text,day_of_week):
+                        
+                        res = str(_) + " " + str(text)
+                        bot.send_message(chat_id,res)
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '9B':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"9B")
-                for _,text in slicer(call.text,day_of_week):
-                    
-                    res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res) 
-                bot.send_message(chat_id,imagine())
+                if str(slicer(call.text,day_of_week)) == "[(1, nan), (2, nan), (3, nan), (4, nan), (5, nan), (6, nan), (7, nan), ('8/0', nan), ('2.1', nan), ('2.2', nan), ('2.3', nan), ('2.4', nan), ('2.5', nan), ('2.6', nan), ('2.7', nan)]":
+                    bot.send_message(chat_id,"Уроков нет")
+                else:
+                    for _,text in slicer(call.text,day_of_week):
+                        
+                        res = str(_) + " " + str(text)
+                        bot.send_message(chat_id,res)
+                
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '10A':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"10A")
-                for _,text in slicer(call.text,day_of_week):
-                    
-                    res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
-                bot.send_message(chat_id,actual(day_of_week,current_date)) 
+                if str(slicer(call.text,day_of_week)) == "[(1, nan), (2, nan), (3, nan), (4, nan), (5, nan), (6, nan), (7, nan), ('8/0', nan), ('2.1', nan), ('2.2', nan), ('2.3', nan), ('2.4', nan), ('2.5', nan), ('2.6', nan), ('2.7', nan)]":
+                    bot.send_message(chat_id,"Уроков нет")
+                else:
+                    for _,text in slicer(call.text,day_of_week):
+                        
+                        res = str(_) + " " + str(text)
+                        bot.send_message(chat_id,res)
+                
+                bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '10Б':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"10Б")
-                for _,text in slicer(call.text,day_of_week):
-                    
-                    res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
-                bot.send_message(chat_id,actual(day_of_week,current_date)) 
+                if str(slicer(call.text,day_of_week)) == "[(1, nan), (2, nan), (3, nan), (4, nan), (5, nan), (6, nan), (7, nan), ('8/0', nan), ('2.1', nan), ('2.2', nan), ('2.3', nan), ('2.4', nan), ('2.5', nan), ('2.6', nan), ('2.7', nan)]":
+                    bot.send_message(chat_id,"Уроков нет")
+                else:
+                    for _,text in slicer(call.text,day_of_week):
+                        
+                        res = str(_) + " " + str(text)
+                        bot.send_message(chat_id,res)
+                
+                bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '11А':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"11А")
-                for _,text in slicer(call.text,day_of_week):
-                    
-                    res = str(_) + " " + str(text)
-                    bot.send_message(chat_id,res)
-                bot.send_message(chat_id,imagine())
-                bot.send_message(chat_id,actual(day_of_week,current_date),parse_mode='MarkdownV2')
+                if str(slicer(call.text,day_of_week)) == "[(1, nan), (2, nan), (3, nan), (4, nan), (5, nan), (6, nan), (7, nan), ('8/0', nan), ('2.1', nan), ('2.2', nan), ('2.3', nan), ('2.4', nan), ('2.5', nan), ('2.6', nan), ('2.7', nan)]":
+                    bot.send_message(chat_id,"Уроков нет")
+                else:
+                    for _,text in slicer(call.text,day_of_week):
+                        
+                        res = str(_) + " " + str(text)
+                        bot.send_message(chat_id,res)
+                
+                bot.send_message(chat_id,actual(day_of_week,current_date))
+            bot.send_message(chat_id,f'<tg-spoiler>{imagine()}</tg-spoiler>',parse_mode='html')
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         bug1 = types.InlineKeyboardButton('Да, еще разок!',callback_data='bug1')
         markup.add(bug1)
         bot.send_message(chat_id,"Чтобы вернуться в начало напишите команду /start")
         bot.register_next_step_handler(call,select)
-                # elif message.text == '/admin':
-                #     bot.send_message(call.chat.id,"Введите команду /admin")
-                #     bot.register_next_step_handler(message,admin)
-                # elif message.text == "/teacher":
-                #     bot.send_message(call.chat.id,"Введите команду /teacher")
-                #     bot.register_next_step_handler(message,teacher_day)
 
 
 

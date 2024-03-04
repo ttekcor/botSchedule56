@@ -84,5 +84,5 @@ def slicer_teach(n,path):
        
 
 
-#print(slicer_teach("Паранько","Понедельник"))
+#print(slicer_teach("Паранько","Понедельник")
 
