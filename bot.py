@@ -320,7 +320,6 @@ def callback(call):
                         bot.send_message(chat_id,res)
                 bot.send_message(chat_id,actual(day_of_week,current_date))
                 
-                bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '7Б':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"7Б")
@@ -331,7 +330,6 @@ def callback(call):
                         
                         res = str(_) + " " + str(text)
                         bot.send_message(chat_id,res)
-                bot.send_message(chat_id,actual(day_of_week,current_date))
                 bot.send_message(chat_id,actual(day_of_week,current_date))
             elif call.text == '7В':
                 chat_id = call.chat.id
@@ -344,7 +342,7 @@ def callback(call):
                         res = str(_) + " " + str(text)
                         bot.send_message(chat_id,res)
                 bot.send_message(chat_id,actual(day_of_week,current_date))
-                bot.send_message(chat_id,actual(day_of_week,current_date))
+                
             elif call.text == '7Г':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"7Г")
@@ -356,7 +354,7 @@ def callback(call):
                         res = str(_) + " " + str(text)
                         bot.send_message(chat_id,res)
                 bot.send_message(chat_id,actual(day_of_week,current_date))
-                bot.send_message(chat_id,actual(day_of_week,current_date))
+               
             elif call.text == '8A':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"8A")
@@ -368,7 +366,7 @@ def callback(call):
                         res = str(_) + " " + str(text)
                         bot.send_message(chat_id,res)
                 bot.send_message(chat_id,actual(day_of_week,current_date))
-                bot.send_message(chat_id,actual(day_of_week,current_date))
+                
             elif call.text == '8Б':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"8Б")
@@ -380,7 +378,7 @@ def callback(call):
                         res = str(_) + " " + str(text)
                         bot.send_message(chat_id,res)
                 bot.send_message(chat_id,actual(day_of_week,current_date))
-                bot.send_message(chat_id,actual(day_of_week,current_date))
+                
             elif call.text == '8В':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"8В")
@@ -392,7 +390,7 @@ def callback(call):
                         res = str(_) + " " + str(text)
                         bot.send_message(chat_id,res)
                 bot.send_message(chat_id,actual(day_of_week,current_date))
-                bot.send_message(chat_id,actual(day_of_week,current_date))
+               
             elif call.text == '8Г':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"8Г")
@@ -404,7 +402,7 @@ def callback(call):
                         res = str(_) + " " + str(text)
                         bot.send_message(chat_id,res)
                 bot.send_message(chat_id,actual(day_of_week,current_date))
-                bot.send_message(chat_id,actual(day_of_week,current_date))
+                
             elif call.text == '9А':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"9А")
@@ -416,7 +414,7 @@ def callback(call):
                         res = str(_) + " " + str(text)
                         bot.send_message(chat_id,res)
                 bot.send_message(chat_id,actual(day_of_week,current_date))
-                bot.send_message(chat_id,actual(day_of_week,current_date))
+                
             elif call.text == '9Б':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"9Б")
@@ -428,7 +426,7 @@ def callback(call):
                         res = str(_) + " " + str(text)
                         bot.send_message(chat_id,res)
                 bot.send_message(chat_id,actual(day_of_week,current_date))
-                bot.send_message(chat_id,actual(day_of_week,current_date))
+                
             elif call.text == '9B':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"9B")
@@ -440,7 +438,7 @@ def callback(call):
                         res = str(_) + " " + str(text)
                         bot.send_message(chat_id,res)
                 bot.send_message(chat_id,actual(day_of_week,current_date))
-                bot.send_message(chat_id,actual(day_of_week,current_date))
+                
             elif call.text == '10A':
                 chat_id = call.chat.id
                 bot.send_message(chat_id,"10A")
