@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Tabs, message } from 'antd';
+import { Layout, Tabs } from 'antd';
 import MainPage from './MainPage';
 import SchedulePage from './SchedulePage';
 import UploadPage from './UploadPage';
@@ -13,7 +13,14 @@ const App: React.FC = () => {
   const [carouselImages, setCarouselImages] = useState<string[]>([]); // Фото для карусели
 
   return (
-    <Layout>
+    
+    <Layout style={{
+      minHeight: '100vh',
+      backgroundImage: "url('botSchedule56/display/kiosk_bot/public/OF18H90.jpg')",
+      backgroundSize: 'auto', // Оставляем реальный размер рисунка
+      backgroundPosition: 'center',
+      backgroundRepeat: 'repeat', // Повторяем изображение для создания паттерна
+    }}>
       <Header style={{ display: 'flex', alignItems: 'center' }}>
         <h2 style={{ color: 'white' }}>Школьное расписание</h2>
       </Header>

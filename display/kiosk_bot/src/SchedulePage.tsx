@@ -72,6 +72,7 @@ const SchedulePage: React.FC<SchedulePageProps> = ({ classes, schedule }) => {
         width={200}
         style={{
           maxHeight: '500px', // Ограничиваем высоту Sider
+          height: '100vh', // Полная высота
           overflowY: 'auto', // Добавляем вертикальную прокрутку
           borderRight: '1px solid #ddd', // Визуально разделяем Sider
         }}
@@ -89,6 +90,7 @@ const SchedulePage: React.FC<SchedulePageProps> = ({ classes, schedule }) => {
           ))}
         </Menu>
       </Sider>
+  
       <Content style={{ padding: '24px' }}>
         {selectedClass ? (
           getClassSchedule(selectedClass).length > 0 ? (
@@ -98,6 +100,7 @@ const SchedulePage: React.FC<SchedulePageProps> = ({ classes, schedule }) => {
                 columns={columns}
                 dataSource={getClassSchedule(selectedClass)}
                 rowKey="number"
+                pagination={false}
               />
             </>
           ) : (

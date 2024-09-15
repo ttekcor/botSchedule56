@@ -1,34 +1,45 @@
 import React from 'react';
-import { Carousel } from 'antd';
+import { Carousel, Layout } from 'antd';
 
 interface MainPageProps {
   images: string[];
 }
-const contentStyle: React.CSSProperties = {
-    margin:0,
-    height: '1000px',
-    color: '#fff',
-    lineHeight: '160px',
-    textAlign: 'center',
-    background: '#364d79',
-  };
+
 const MainPage: React.FC<MainPageProps> = ({ images }) => {
-  return (
-    <div>
-      <h3>Главная страница</h3>
+  return <Layout style={{
+    minHeight: '100vh',
+    backgroundImage: "url('botSchedule56/display/kiosk_bot/public/OF18H90.jpg')",
+    backgroundSize: 'auto', // Оставляем реальный размер рисунка
+    backgroundPosition: 'center',
+    backgroundRepeat: 'repeat', // Повторяем изображение для создания паттерна
+  }}>
+    
+    <h2>Добро пожаловать на главную страницу</h2>
+
+    <Carousel autoplay style={{ maxWidth: '1000px', margin: '0 auto' }} arrows={true}>
       {images.length > 0 ? (
-        <Carousel arrows infinite={false}>
-          {images.map((image, index) => (
-            <div key={index}>
-              <img src={image} alt={`carousel-${index}`} style={contentStyle} />
-            </div>
-          ))}
-        </Carousel>
+        images.map((image, index) => (
+          <div key={index} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <img
+              src={image}
+              alt={`Slide ${index}`}
+              style={{
+                width: '100%', // Задаем ширину изображения
+                maxHeight: '1900px', // Ограничиваем максимальную высоту
+                objectFit: 'contain', // Изображение адаптируется по размеру
+                margin: '0 auto',
+              }} />
+          </div>
+        ))
       ) : (
-        <p>Загрузите изображения для карусели.</p>
+        <div>
+          <h3>Нет изображений для отображения</h3>
+        </div>
       )}
-    </div>
-  );
+    </Carousel>
+ 
+  </Layout>;
+
 };
 
 export default MainPage;
