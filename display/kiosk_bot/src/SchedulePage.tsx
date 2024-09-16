@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Layout, Menu, Table, Empty, theme } from 'antd';
-import './App.css';
-
+import React, { useState } from "react";
+import { Layout, Menu, Table, Empty, theme } from "antd";
+import "./App.css";
 
 const { Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -24,7 +23,7 @@ const SchedulePage: React.FC<SchedulePageProps> = ({ classes, schedule }) => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   // Массив с фамилиями учителей
-  const teachers = ['Иванов', 'Петров', 'Сидоров', 'Кузнецов', 'Смирнов'];
+  const teachers = ["Иванов", "Петров", "Сидоров", "Кузнецов", "Смирнов"];
 
   // Функция для получения расписания конкретного класса
   const getClassSchedule = (className: string): ScheduleRow[] => {
@@ -37,12 +36,14 @@ const SchedulePage: React.FC<SchedulePageProps> = ({ classes, schedule }) => {
     if (classIndex === -1) return []; // Если класс не найден
 
     // Извлекаем данные для выбранного класса
-    const classSchedule: ScheduleRow[] = schedule.slice(1).map((row: any[]) => ({
-      number: row[0], // Номер урока
-      lesson: row[classIndex], // Название урока
-      teacher1: row[classIndex + 1], // Учитель 1
-      teacher2: row[classIndex + 2] || '', // Учитель 2 (если есть)
-    }));
+    const classSchedule: ScheduleRow[] = schedule
+      .slice(1)
+      .map((row: any[]) => ({
+        number: row[0], // Номер урока
+        lesson: row[classIndex], // Название урока
+        teacher1: row[classIndex + 1], // Учитель 1
+        teacher2: row[classIndex + 2] || "", // Учитель 2 (если есть)
+      }));
 
     // Убираем пустые строки (если урок пуст)
     return classSchedule.filter((row) => row.lesson);
@@ -51,45 +52,43 @@ const SchedulePage: React.FC<SchedulePageProps> = ({ classes, schedule }) => {
   // Колонки для таблицы
   const columns = [
     {
-      title: 'Номер урока',
-      dataIndex: 'number',
-      key: 'number',
+      title: "Номер урока",
+      dataIndex: "number",
+      key: "number",
     },
     {
-      title: 'Урок',
-      dataIndex: 'lesson',
-      key: 'lesson',
+      title: "Урок",
+      dataIndex: "lesson",
+      key: "lesson",
     },
     {
-      title: 'Учитель 1',
-      dataIndex: 'teacher1',
-      key: 'teacher1',
+      title: "Учитель 1",
+      dataIndex: "teacher1",
+      key: "teacher1",
     },
     {
-      title: 'Учитель 2',
-      dataIndex: 'teacher2',
-      key: 'teacher2',
+      title: "Учитель 2",
+      dataIndex: "teacher2",
+      key: "teacher2",
     },
   ];
 
   return (
-    <Layout style={{ padding: '24px 0', background: colorBgContainer, borderRadius: borderRadiusLG }}>
-      <Sider
-        style={{ background: colorBgContainer }} width={200}
-        
-      >
-        <Menu
-          mode="inline"
-          defaultSelectedKeys={['1']}
-         
-        >
+    <Layout
+      style={{
+        padding: "24px 0",
+        background: colorBgContainer,
+        borderRadius: borderRadiusLG,
+      }}
+    >
+      <Sider style={{ background: colorBgContainer }} width={200}>
+        <Menu mode="inline" defaultSelectedKeys={["1"]}>
           {/* Группа для классов */}
           <SubMenu key="classes" title="Классы">
             {classes.map((className) => (
               <Menu.Item
                 key={className}
                 onClick={() => setSelectedClass(className)}
-                
               >
                 {className}
               </Menu.Item>
@@ -99,18 +98,13 @@ const SchedulePage: React.FC<SchedulePageProps> = ({ classes, schedule }) => {
           {/* Группа для учителей */}
           <SubMenu key="teachers" title="Учителя">
             {teachers.map((teacher) => (
-              <Menu.Item
-                key={teacher}
-                
-              >
-                {teacher}
-              </Menu.Item>
+              <Menu.Item key={teacher}>{teacher}</Menu.Item>
             ))}
           </SubMenu>
         </Menu>
       </Sider>
 
-      <Content style={{ padding: '24px' }}>
+      <Content style={{ padding: "24px" }}>
         {selectedClass ? (
           getClassSchedule(selectedClass).length > 0 ? (
             <>

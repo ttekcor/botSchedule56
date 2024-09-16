@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import * as XLSX from 'xlsx';
-import { message, Upload, Button } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import React, { useState } from "react";
+import * as XLSX from "xlsx";
+import { message, Upload, Button } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 
 interface UploadPageProps {
   setClasses: (classes: string[]) => void;
@@ -9,14 +9,18 @@ interface UploadPageProps {
   setCarouselImages: (images: string[]) => void;
 }
 
-const UploadPage: React.FC<UploadPageProps> = ({ setClasses, setSchedule, setCarouselImages }) => {
+const UploadPage: React.FC<UploadPageProps> = ({
+  setClasses,
+  setSchedule,
+  setCarouselImages,
+}) => {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
 
   const handleFileUpload = (file: File) => {
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
       const data = e.target?.result;
-      const workbook = XLSX.read(data, { type: 'binary' });
+      const workbook = XLSX.read(data, { type: "binary" });
 
       // Извлекаем первый лист
       const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -37,7 +41,7 @@ const UploadPage: React.FC<UploadPageProps> = ({ setClasses, setSchedule, setCar
       setSchedule(rows);
 
       // Отображаем сообщение об успешной загрузке
-      message.success('Данные загружены успешно');
+      message.success("Данные загружены успешно");
     };
 
     reader.readAsArrayBuffer(file);
@@ -52,7 +56,7 @@ const UploadPage: React.FC<UploadPageProps> = ({ setClasses, setSchedule, setCar
   const handleImageUploadFinish = () => {
     const imageUrls = imageFiles.map((file) => URL.createObjectURL(file));
     setCarouselImages(imageUrls);
-    message.success('Фотографии для карусели загружены успешно');
+    message.success("Фотографии для карусели загружены успешно");
   };
 
   return (
@@ -67,12 +71,12 @@ const UploadPage: React.FC<UploadPageProps> = ({ setClasses, setSchedule, setCar
           }
         }}
       />
-      <h3 style={{ marginTop: '20px' }}>Загрузить фотографии для карусели</h3>
+      <h3 style={{ marginTop: "20px" }}>Загрузить фотографии для карусели</h3>
       <Upload multiple beforeUpload={() => false} onChange={handleImageUpload}>
         <Button icon={<UploadOutlined />}>Загрузить изображения</Button>
       </Upload>
       {imageFiles.length > 0 && (
-        <Button style={{ marginTop: '10px' }} onClick={handleImageUploadFinish}>
+        <Button style={{ marginTop: "10px" }} onClick={handleImageUploadFinish}>
           Сохранить изображения
         </Button>
       )}

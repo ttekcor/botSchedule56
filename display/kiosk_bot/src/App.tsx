@@ -14,7 +14,7 @@ const App: React.FC = () => {
 
   return (
     
-    <Layout >
+    <Layout>
       <Header style={{ display: 'flex', alignItems: 'center' }}>
         <h2 style={{ color: 'white' }}>Школьное расписание</h2>
       </Header>
