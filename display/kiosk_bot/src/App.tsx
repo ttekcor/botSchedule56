@@ -14,13 +14,7 @@ const App: React.FC = () => {
 
   return (
     
-    <Layout style={{
-      minHeight: '100vh',
-      backgroundImage: "url('botSchedule56/display/kiosk_bot/public/OF18H90.jpg')",
-      backgroundSize: 'auto', // Оставляем реальный размер рисунка
-      backgroundPosition: 'center',
-      backgroundRepeat: 'repeat', // Повторяем изображение для создания паттерна
-    }}>
+    <Layout >
       <Header style={{ display: 'flex', alignItems: 'center' }}>
         <h2 style={{ color: 'white' }}>Школьное расписание</h2>
       </Header>

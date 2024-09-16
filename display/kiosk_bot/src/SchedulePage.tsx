@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Table, Empty } from 'antd';
+import { Layout, Menu, Table, Empty, theme } from 'antd';
+import './App.css';
 
 const { Sider, Content } = Layout;
+const { SubMenu } = Menu;
 
 interface ScheduleRow {
   number: string;
@@ -17,6 +19,11 @@ interface SchedulePageProps {
 
 const SchedulePage: React.FC<SchedulePageProps> = ({ classes, schedule }) => {
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
+  const {
+    token: { colorBgContainer, borderRadiusLG },
+  } = theme.useToken();
+  // Массив с фамилиями учителей
+  const teachers = ['Иванов', 'Петров', 'Сидоров', 'Кузнецов', 'Смирнов'];
 
   // Функция для получения расписания конкретного класса
   const getClassSchedule = (className: string): ScheduleRow[] => {
@@ -65,32 +72,43 @@ const SchedulePage: React.FC<SchedulePageProps> = ({ classes, schedule }) => {
   ];
 
   return (
-    <Layout>
-        
+    <Layout style={{ padding: '24px 0', background: colorBgContainer, borderRadius: borderRadiusLG }}>
       <Sider
-      
-        width={200}
-        style={{
-          maxHeight: '500px', // Ограничиваем высоту Sider
-          height: '100vh', // Полная высота
-          overflowY: 'auto', // Добавляем вертикальную прокрутку
-          borderRight: '1px solid #ddd', // Визуально разделяем Sider
-        }}
-      >
+        style={{ background: colorBgContainer }} width={200}
         
+      >
         <Menu
           mode="inline"
           defaultSelectedKeys={['1']}
-          style={{ height: '100%', borderRight: 0 }}
+         
         >
-          {classes.map((className) => (
-            <Menu.Item key={className} onClick={() => setSelectedClass(className)}>
-              {className}
-            </Menu.Item>
-          ))}
+          {/* Группа для классов */}
+          <SubMenu key="classes" title="Классы">
+            {classes.map((className) => (
+              <Menu.Item
+                key={className}
+                onClick={() => setSelectedClass(className)}
+                
+              >
+                {className}
+              </Menu.Item>
+            ))}
+          </SubMenu>
+
+          {/* Группа для учителей */}
+          <SubMenu key="teachers" title="Учителя">
+            {teachers.map((teacher) => (
+              <Menu.Item
+                key={teacher}
+                
+              >
+                {teacher}
+              </Menu.Item>
+            ))}
+          </SubMenu>
         </Menu>
       </Sider>
-  
+
       <Content style={{ padding: '24px' }}>
         {selectedClass ? (
           getClassSchedule(selectedClass).length > 0 ? (
