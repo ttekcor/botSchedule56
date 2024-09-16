@@ -13,8 +13,8 @@ const MainPage: React.FC<MainPageProps> = ({ images }) => {
     backgroundPosition: 'center',
     backgroundRepeat: 'repeat', // Повторяем изображение для создания паттерна
   }}>
-    
-    <h2>Добро пожаловать на главную страницу</h2>
+    <div style={{ padding: '24px', textAlign: 'center' }}>
+  
 
     <Carousel autoplay style={{ maxWidth: '1000px', margin: '0 auto' }} arrows={true}>
       {images.length > 0 ? (
@@ -37,7 +37,7 @@ const MainPage: React.FC<MainPageProps> = ({ images }) => {
         </div>
       )}
     </Carousel>
- 
+  </div>
   </Layout>;
 
 };
