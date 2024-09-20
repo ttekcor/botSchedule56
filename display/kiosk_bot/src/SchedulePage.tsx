@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Layout, Menu, Table, Empty, Tabs } from 'antd';
-
+import React, { useState, useEffect } from 'react';
+import { Layout, Menu, Table, Empty, Tabs, Button } from 'antd';
+import axios from 'axios';
+//import * as XLSX from 'xlsx';
 const { Sider, Content } = Layout;
 const { TabPane } = Tabs;
 
@@ -13,46 +14,65 @@ interface ScheduleRow {
 
 interface SchedulePageProps {
   classes: string[];
-  schedule: any[][]; // Расписание (двумерный массив)
 }
 
-const SchedulePage: React.FC<SchedulePageProps> = ({ classes, schedule }) => {
+const SchedulePage: React.FC<SchedulePageProps> = ({ classes }) => {
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
   const [selectedTeacher, setSelectedTeacher] = useState<string | null>(null);
+  const [schedule, setSchedule] = useState<any[][]>([]);
+  const [selectedDay, setSelectedDay] = useState<string>('pn'); // по умолчанию понедельник
 
-  // Функция для получения расписания конкретного класса
+  const dayToFileMap: { [key: string]: string } = {
+    pn: 'sch_pn.xlsx',
+    vt: 'sch_vt.xlsx',
+    sr: 'sch_sr.xlsx',
+    cht: 'sch_cht.xlsx',
+    pt: 'sch_pt.xlsx',
+  };
+
+  // Загружаем расписание для выбранного дня
+  const loadScheduleForDay = (day: string) => {
+    axios.get(`http://localhost:5000/api/schedule/${dayToFileMap[day]}`)
+      .then((response) => {
+        setSchedule(response.data); // JSON данные, возвращенные с сервера
+        console.log(response);
+      })
+      .catch((error) => {
+        console.error('Ошибка при загрузке расписания', error);
+      });
+  };
+
+  useEffect(() => {
+    loadScheduleForDay(selectedDay);
+  }, [selectedDay]);
+
   const getClassSchedule = (className: string): ScheduleRow[] => {
-    if (!schedule.length) return [];
-
-    const headerRow = schedule[0];
+    const headerRow = schedule[0] || [];
     const classIndex = headerRow.indexOf(className);
 
-    if (classIndex === -1) return []; // Если класс не найден
+    if (classIndex === -1) return [];
 
     const classSchedule: ScheduleRow[] = schedule.slice(1).map((row: any[]) => ({
-      number: row[0], // Номер урока
-      lesson: row[classIndex], // Название урока
-      teacher1: row[classIndex + 1], // Учитель 1
-      teacher2: row[classIndex + 2] || '', // Учитель 2 (если есть)
+      number: row[0],
+      lesson: row[classIndex],
+      teacher1: row[classIndex + 1],
+      teacher2: row[classIndex + 2] || '',
     }));
 
     return classSchedule.filter((row) => row.lesson);
   };
 
-  // Функция для получения расписания конкретного учителя
   const getTeacherSchedule = (teacherName: string): { number: string; class: string }[] => {
     const teacherSchedule: { number: string; class: string }[] = [];
 
-    // Проходим по каждому классу
     classes.forEach((className) => {
       const classSchedule = getClassSchedule(className);
 
       classSchedule.forEach((lesson) => {
-        // Если учитель найден в расписании, добавляем его урок
         if (lesson.teacher1 === teacherName || lesson.teacher2 === teacherName) {
           teacherSchedule.push({
-            number: lesson.number, // Номер урока
-            class: className, // Номер класса
+            number: lesson.number,
+            class: className,
           });
         }
       });
@@ -61,79 +81,62 @@ const SchedulePage: React.FC<SchedulePageProps> = ({ classes, schedule }) => {
     return teacherSchedule;
   };
 
-  // Колонки для таблицы расписания классов
   const classColumns = [
-    {
-      title: 'Номер урока',
-      dataIndex: 'number',
-      key: 'number',
-    },
-    {
-      title: 'Урок',
-      dataIndex: 'lesson',
-      key: 'lesson',
-    },
-    {
-      title: 'Учитель 1',
-      dataIndex: 'teacher1',
-      key: 'teacher1',
-    },
-    {
-      title: 'Учитель 2',
-      dataIndex: 'teacher2',
-      key: 'teacher2',
-    },
+    { title: 'Номер урока', dataIndex: 'number', key: 'number' },
+    { title: 'Урок', dataIndex: 'lesson', key: 'lesson' },
+    { title: 'Учитель 1', dataIndex: 'teacher1', key: 'teacher1' },
+    { title: 'Учитель 2', dataIndex: 'teacher2', key: 'teacher2' },
   ];
 
-  // Колонки для таблицы расписания учителей
   const teacherColumns = [
-    {
-      title: 'Номер урока',
-      dataIndex: 'number',
-      key: 'number',
-    },
-    {
-      title: 'Класс',
-      dataIndex: 'class',
-      key: 'class',
-    },
+    { title: 'Номер урока', dataIndex: 'number', key: 'number' },
+    { title: 'Класс', dataIndex: 'class', key: 'class' },
   ];
+
+  // Создаем массив элементов для меню классов
+  const classMenuItems = classes.map((className) => ({
+    key: className,
+    label: className,
+    onClick: () => setSelectedClass(className),
+  }));
+
+  // Создаем массив элементов для меню учителей
+  const teacherMenuItems = classes
+    .reduce<string[]>((teachers, className) => {
+      const classSchedule = getClassSchedule(className);
+      classSchedule.forEach((lesson) => {
+        if (!teachers.includes(lesson.teacher1)) teachers.push(lesson.teacher1);
+        if (lesson.teacher2 && !teachers.includes(lesson.teacher2)) teachers.push(lesson.teacher2);
+      });
+      return teachers;
+    }, [])
+    .map((teacherName) => ({
+      key: teacherName,
+      label: teacherName,
+      onClick: () => setSelectedTeacher(teacherName),
+    }));
 
   return (
     <Layout>
+      {/* Кнопки для выбора дня недели */}
+      <div style={{ marginBottom: '20px' }}>
+        <Button onClick={() => setSelectedDay('pn')}>Понедельник</Button>
+        <Button onClick={() => setSelectedDay('vt')}>Вторник</Button>
+        <Button onClick={() => setSelectedDay('sr')}>Среда</Button>
+        <Button onClick={() => setSelectedDay('cht')}>Четверг</Button>
+        <Button onClick={() => setSelectedDay('pt')}>Пятница</Button>
+      </div>
+
       <Tabs defaultActiveKey="1">
         <TabPane tab="Расписание классов" key="1">
           <Layout>
-            <Sider
-              width={200}
-              style={{
-                maxHeight: '100vh',
-                height: '100vh',
-                overflowY: 'auto',
-                borderRight: '1px solid #ddd',
-              }}
-            >
-              <Menu mode="inline" defaultSelectedKeys={['1']} style={{ height: '100%', borderRight: 0 }}>
-                {classes.map((className) => (
-                  <Menu.Item key={className} onClick={() => setSelectedClass(className)}>
-                    {className}
-                  </Menu.Item>
-                ))}
-              </Menu>
+            <Sider width={200}>
+              <Menu mode="inline" defaultSelectedKeys={['1']} style={{ height: '100%' }} items={classMenuItems} />
             </Sider>
-
             <Content style={{ padding: '24px' }}>
               {selectedClass ? (
                 getClassSchedule(selectedClass).length > 0 ? (
-                  <>
-                    <h3>Расписание для класса {selectedClass}</h3>
-                    <Table
-                      columns={classColumns}
-                      dataSource={getClassSchedule(selectedClass)}
-                      rowKey="number"
-                      pagination={false}
-                    />
-                  </>
+                  <Table columns={classColumns} dataSource={getClassSchedule(selectedClass)} rowKey="number" />
                 ) : (
                   <Empty description="Нет данных для этого класса" />
                 )
@@ -146,44 +149,13 @@ const SchedulePage: React.FC<SchedulePageProps> = ({ classes, schedule }) => {
 
         <TabPane tab="Расписание учителей" key="2">
           <Layout>
-            <Sider
-              width={200}
-              style={{
-                maxHeight: '100vh',
-                height: '100vh',
-                overflowY: 'auto',
-                borderRight: '1px solid #ddd',
-              }}
-            >
-              <Menu mode="inline" defaultSelectedKeys={['1']} style={{ height: '100%', borderRight: 0 }}>
-                {classes.reduce<string[]>((teachers, className) => {
-                  // Получаем всех учителей из расписания классов
-                  const classSchedule = getClassSchedule(className);
-                  classSchedule.forEach((lesson) => {
-                    if (!teachers.includes(lesson.teacher1)) teachers.push(lesson.teacher1);
-                    if (lesson.teacher2 && !teachers.includes(lesson.teacher2)) teachers.push(lesson.teacher2);
-                  });
-                  return teachers;
-                }, []).map((teacherName) => (
-                  <Menu.Item key={teacherName} onClick={() => setSelectedTeacher(teacherName)}>
-                    {teacherName}
-                  </Menu.Item>
-                ))}
-              </Menu>
+            <Sider width={200}>
+              <Menu mode="inline" defaultSelectedKeys={['1']} style={{ height: '100%' }} items={teacherMenuItems} />
             </Sider>
-
             <Content style={{ padding: '24px' }}>
               {selectedTeacher ? (
                 getTeacherSchedule(selectedTeacher).length > 0 ? (
-                  <>
-                    <h3>Расписание для учителя {selectedTeacher}</h3>
-                    <Table
-                      columns={teacherColumns}
-                      dataSource={getTeacherSchedule(selectedTeacher)}
-                      rowKey="number"
-                      pagination={false}
-                    />
-                  </>
+                  <Table columns={teacherColumns} dataSource={getTeacherSchedule(selectedTeacher)} rowKey="number" />
                 ) : (
                   <Empty description="Нет данных для этого учителя" />
                 )
