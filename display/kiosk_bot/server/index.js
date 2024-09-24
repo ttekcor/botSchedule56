@@ -1,11 +1,11 @@
-const express = require('express');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const cors = require('cors'); // Подключение cors
-const XLSX = require('xlsx'); // Пакет для работы с Excel
+const express = require("express");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+const cors = require("cors");
+const XLSX = require("xlsx");
 
-const uploadDir = path.join(__dirname, 'upload');
+const uploadDir = path.join(__dirname, "upload");
 
 // Создаем папку для загрузки файлов, если она не существует
 if (!fs.existsSync(uploadDir)) {
@@ -30,24 +30,24 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Маршрут для загрузки файлов
-app.post('/api/upload/:fileName', upload.single('file'), (req, res) => {
+app.post("/api/upload/:fileName", upload.single("file"), (req, res) => {
   const fileName = req.params.fileName;
   if (!req.file) {
-    console.error('Ошибка: Файл не был загружен');
-    return res.status(400).send('No file uploaded');
+    console.error("Ошибка: Файл не был загружен");
+    return res.status(400).send("No file uploaded");
   }
-  console.log('Файл загружен:', req.file); // Логирование информации о файле
+  console.log("Файл загружен:", req.file); // Логирование информации о файле
   res.send({ message: `${fileName} uploaded successfully` });
 });
 
 // Маршрут для получения расписания для конкретного дня в формате JSON
-app.get('/api/schedule/:fileName', (req, res) => {
+app.get("/api/schedule/:fileName", (req, res) => {
   const fileName = req.params.fileName;
   const filePath = path.join(uploadDir, fileName);
 
   // Проверяем, существует ли файл
   if (!fs.existsSync(filePath)) {
-    return res.status(404).send('File not found');
+    return res.status(404).send("File not found");
   }
 
   // Читаем Excel файл
@@ -62,7 +62,36 @@ app.get('/api/schedule/:fileName', (req, res) => {
   res.json(jsonData);
 });
 
+// Эндпоинт для получения учителей из загруженного расписания
+app.get("/api/teachers/:fileName", (req, res) => {
+  const fileName = req.params.fileName;
+  const filePath = path.join(uploadDir, fileName);
+
+  // Проверяем, существует ли файл
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send("File not found");
+  }
+
+  // Читаем Excel файл
+  const workbook = XLSX.readFile(filePath);
+  const sheetName = workbook.SheetNames[0]; // Выбираем первый лист
+  const sheet = workbook.Sheets[sheetName];
+
+  // Преобразуем данные в формат JSON
+  const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+  // Извлекаем учителей
+  const teachers = new Set();
+  jsonData.slice(1).forEach((row) => {
+    if (row[2]) teachers.add(row[2]); // Учитель 1
+    if (row[3]) teachers.add(row[3]); // Учитель 2
+  });
+
+  // Возвращаем список уникальных учителей
+  res.json(Array.from(teachers));
+});
+
 // Запуск сервера
 app.listen(5000, () => {
-  console.log('Server is running on port 5000');
+  console.log("Server is running on port 5000");
 });
