@@ -12,8 +12,25 @@ const App: React.FC = () => {
   const [schedule, setSchedule] = useState<any[][]>([]); // Расписание
   const [carouselImages, setCarouselImages] = useState<string[]>([]); // Фото для карусели
 
+  // Функция для обработки загруженных данных
+  const handleScheduleUpload = (uploadedSchedule: any[][]) => {
+    console.log('2',uploadedSchedule)
+    setSchedule(uploadedSchedule); // Устанавливаем расписание
+    const classNames = extractClassNames(uploadedSchedule); // Извлекаем список классов
+    console.log('2',classNames)
+    setClasses(classNames); // Устанавливаем классы
+  };
+
+  // Функция для извлечения уникальных классов из загруженного расписания
+  const extractClassNames = (scheduleData: any[][]): string[] => {
+    if (scheduleData.length === 0) return [];
+    const headerRow = scheduleData[0]; // Предположим, что первая строка содержит названия классов
+    const classNames = headerRow.filter((cell: any, index: number) => index % 3 === 1); // Предположим, что классы находятся в каждом 2-ом столбце
+    return Array.from(new Set(classNames)); // Убираем дубли
+  };
+  console.log('rk',classes)
+
   return (
-    
     <Layout>
       <Header style={{ display: 'flex', alignItems: 'center' }}>
         <h2 style={{ color: 'white' }}>Школьное расписание</h2>
@@ -24,10 +41,11 @@ const App: React.FC = () => {
             <MainPage images={carouselImages} />
           </TabPane>
           <TabPane tab="Расписание" key="2">
-            <SchedulePage classes={classes} schedule={schedule} />
+            <SchedulePage classes={classes}/>
           </TabPane>
           <TabPane tab="Загрузить данные" key="3">
-            <UploadPage setClasses={setClasses} setSchedule={setSchedule} setCarouselImages={setCarouselImages} />
+            {/* Передаем функцию handleScheduleUpload в UploadPage */}
+            <UploadPage onUpload={handleScheduleUpload} />
           </TabPane>
         </Tabs>
       </Content>

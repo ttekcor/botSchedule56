@@ -80,15 +80,29 @@ app.get("/api/teachers/:fileName", (req, res) => {
   // Преобразуем данные в формат JSON
   const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-  // Извлекаем учителей
   const teachers = new Set();
+  console.log(jsonData);
+  
   jsonData.slice(1).forEach((row) => {
-    if (row[2]) teachers.add(row[2]); // Учитель 1
-    if (row[3]) teachers.add(row[3]); // Учитель 2
+    console.log('Row data:', row);
+  
+    // Проходим по каждому третьему столбцу, начиная с 2 и 3 столбца
+    for (let i = 2; i < row.length; i += 3) {
+      if (row[i]) {
+        console.log('Teacher:', row[i]);
+        teachers.add(row[i]); // Учитель из каждого 3-го столбца начиная с 2-го
+      }
+      if (row[i + 1]) {
+        console.log('Teacher:', row[i + 1]);
+        teachers.add(row[i + 1]); // Учитель из каждого 3-го столбца начиная с 3-го
+      }
+    }
   });
-
-  // Возвращаем список уникальных учителей
-  res.json(Array.from(teachers));
+  
+  const teacherArray = Array.from(teachers);
+  console.log('Final list of teachers:', teacherArray);
+  res.json(teacherArray);
+  
 });
 
 // Запуск сервера
