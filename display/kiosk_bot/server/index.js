@@ -62,7 +62,7 @@ app.get("/api/schedule/:fileName", (req, res) => {
   res.json(jsonData);
 });
 
-// Эндпоинт для получения учителей из загруженного расписания
+// Эндпоинт для получения учителей и их расписания из загруженного расписания
 app.get("/api/teachers/:fileName", (req, res) => {
   const fileName = req.params.fileName;
   const filePath = path.join(uploadDir, fileName);
@@ -80,29 +80,47 @@ app.get("/api/teachers/:fileName", (req, res) => {
   // Преобразуем данные в формат JSON
   const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-  const teachers = new Set();
+  const teachers = new Map();
   console.log(jsonData);
-  
+
+  // Обрабатываем строки с расписанием
   jsonData.slice(1).forEach((row) => {
-    console.log('Row data:', row);
-  
-    // Проходим по каждому третьему столбцу, начиная с 2 и 3 столбца
+    const lessonNumber = row[0]; // Номер урока
+    const lessonName = row[1]; // Название урока
+    // Проходим по каждому третьему столбцу, начиная со второго
     for (let i = 2; i < row.length; i += 3) {
-      if (row[i]) {
-        console.log('Teacher:', row[i]);
-        teachers.add(row[i]); // Учитель из каждого 3-го столбца начиная с 2-го
+      const teacher1 = row[i]; // Первый учитель
+      const teacher2 = row[i + 1]; // Второй учитель (если есть)
+
+      if (teacher1) {
+        if (!teachers.has(teacher1)) {
+          teachers.set(teacher1, []);
+        }
+        teachers
+          .get(teacher1)
+          .push({ number: lessonNumber, lesson: lessonName });
       }
-      if (row[i + 1]) {
-        console.log('Teacher:', row[i + 1]);
-        teachers.add(row[i + 1]); // Учитель из каждого 3-го столбца начиная с 3-го
+
+      if (teacher2) {
+        if (!teachers.has(teacher2)) {
+          teachers.set(teacher2, []);
+        }
+        teachers
+          .get(teacher2)
+          .push({ number: lessonNumber, lesson: lessonName });
       }
     }
   });
-  
-  const teacherArray = Array.from(teachers);
-  console.log('Final list of teachers:', teacherArray);
+
+  const teacherArray = Array.from(teachers.entries()).map(
+    ([teacher, schedule]) => ({
+      teacher,
+      schedule,
+    })
+  );
+
+  console.log("Расписание для учителей:", teacherArray);
   res.json(teacherArray);
-  
 });
 
 // Запуск сервера
