@@ -5,55 +5,59 @@ import SchedulePage from "./SchedulePage";
 import UploadPage from "./UploadPage";
 
 const { Header, Content, Footer } = Layout;
-const { TabPane } = Tabs;
 
 const App: React.FC = () => {
-  const [classes, setClasses] = useState<string[]>([]); // Классы
-  const [schedule, setSchedule] = useState<any[][]>([]); // Расписание
-  const [carouselImages, setCarouselImages] = useState<string[]>([]); // Фото для карусели
+  const [classes, setClasses] = useState<string[]>([]);
+  const [schedule, setSchedule] = useState<any[][]>([]);
+  const [carouselImages, setCarouselImages] = useState<string[]>([]);
 
-  // Функция для обработки загруженных данных
   const handleScheduleUpload = (uploadedSchedule: any[][]) => {
-    console.log("2", uploadedSchedule);
-    setSchedule(uploadedSchedule); // Устанавливаем расписание
-    const classNames = extractClassNames(uploadedSchedule); // Извлекаем список классов
-    console.log("2", classNames);
-    setClasses(classNames); // Устанавливаем классы
+    if (!uploadedSchedule || uploadedSchedule.length === 0) {
+      console.error("Пустое или некорректное расписание");
+      return;
+    }
+    setSchedule(uploadedSchedule);
+
+    const classNames = extractClassNames(uploadedSchedule);
+    setClasses(classNames);
   };
 
-  // Функция для извлечения уникальных классов из загруженного расписания
   const extractClassNames = (scheduleData: any[][]): string[] => {
     if (scheduleData.length === 0) return [];
-    const headerRow = scheduleData[0]; // Предположим, что первая строка содержит названия классов
+    const headerRow = scheduleData[0];
     const classNames = headerRow.filter(
-      (cell: any, index: number) => index % 3 === 1
-    ); // Предположим, что классы находятся в каждом 2-ом столбце
-    return Array.from(new Set(classNames)); // Убираем дубли
+      (cell: any, index: number) => index % 3 === 1 && typeof cell === "string"
+    );
+    return Array.from(new Set(classNames));
   };
-  console.log("rk", classes);
+
+  const tabItems = [
+    {
+      key: "1",
+      label: "Главная",
+      children: <MainPage images={carouselImages} />,
+    },
+    {
+      key: "2",
+      label: "Расписание",
+      children: <SchedulePage />,
+    },
+    {
+      key: "3",
+      label: "Загрузка расписания",
+      children: <UploadPage onUpload={handleScheduleUpload} />,
+    },
+  ];
 
   return (
-    <Layout>
-      <Header style={{ display: "flex", alignItems: "center", height: "100%" }}>
-        <h2 style={{ color: "white" }}>Школьное расписание</h2>
+    <Layout style={{ minHeight: "100vh" }}>
+      <Header>
+        <h1 style={{ color: "white" }}>Школьное расписание</h1>
       </Header>
-      <Content style={{ padding: "24px" }}>
-        <Tabs defaultActiveKey="1">
-          <TabPane tab="Главная" key="1">
-            <MainPage images={carouselImages} />
-          </TabPane>
-          <TabPane tab="Расписание" key="2">
-            <SchedulePage classes={classes} />
-          </TabPane>
-          <TabPane tab="Загрузить данные" key="3">
-            {/* Передаем функцию handleScheduleUpload в UploadPage */}
-            <UploadPage onUpload={handleScheduleUpload} />
-          </TabPane>
-        </Tabs>
+      <Content style={{ padding: "20px" }}>
+        <Tabs defaultActiveKey="1" items={tabItems} />
       </Content>
-      <Footer style={{ textAlign: "center" }}>
-        Ant Design ©2024 Created by You
-      </Footer>
+      <Footer style={{ textAlign: "center" }}>© 2024 Школа</Footer>
     </Layout>
   );
 };
