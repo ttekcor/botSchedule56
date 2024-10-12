@@ -9,6 +9,7 @@ const { Header, Content, Footer } = Layout;
 const App: React.FC = () => {
   const [classes, setClasses] = useState<string[]>([]);
   const [schedule, setSchedule] = useState<any[][]>([]);
+
   const [carouselImages, setCarouselImages] = useState<string[]>([]);
 
   const handleScheduleUpload = (uploadedSchedule: any[][]) => {
@@ -25,6 +26,7 @@ const App: React.FC = () => {
   const extractClassNames = (scheduleData: any[][]): string[] => {
     if (scheduleData.length === 0) return [];
     const headerRow = scheduleData[0];
+
     const classNames = headerRow.filter(
       (cell: any, index: number) => index % 3 === 1 && typeof cell === "string"
     );
