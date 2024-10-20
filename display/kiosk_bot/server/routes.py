@@ -19,7 +19,9 @@ def register_routes(app):
     # Маршрут для получения расписания
     @app.route('/api/schedule/<fileName>', methods=['GET'])
     def get_schedule(fileName):
+        print(f"Запрос расписания для файла: {fileName}")
         if not file_exists(fileName):
+            print(f"Файл {fileName} не найден")
             return 'File not found', 404
 
         schedule = get_schedule_from_excel(fileName)
@@ -40,4 +42,3 @@ def register_routes(app):
         else:
             all_schedules = get_teacher_schedule(fileName)
             return jsonify(all_schedules), 200
-

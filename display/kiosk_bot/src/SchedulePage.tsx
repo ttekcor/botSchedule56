@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Layout, Menu, Table, Segmented, message } from "antd";
 import { LaptopOutlined, UserOutlined } from "@ant-design/icons";
+import axios from "axios";
 
 const { Sider, Content } = Layout;
 
@@ -38,58 +39,77 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
 
   // Функция для загрузки расписания
   const loadSchedule = (fileName: string) => {
-    fetch(`http://localhost:5000/api/schedule/${fileName}`)
-      .then((res) => res.json())
-      .then((data: any[][]) => {
+    axios
+      .get(`http://127.0.0.1:5000/api/schedule/${fileName}`) // Запрос на получение расписания
+      .then((response) => {
+        const data = response.data; // Данные в формате JSON
         if (data && data.length > 0) {
-          setSchedule(data);
+          setSchedule(data); // Сохранение данных расписания
+          console.log(data);
 
+          // Извлечение уникальных классов
           const uniqueClasses = Array.from(
             new Set(
               data[0]
-                .slice(2)
-                .filter((_: any, index: number) => index % 3 === 0)
+                .slice(2) // Пропускаем первые два столбца (например, номер урока и другие поля)
+                .filter((_: any, index: number) => index % 3 === 0) // Извлекаем каждый третий элемент (классы)
             )
           ) as string[];
-          setClasses(uniqueClasses);
+
+          setClasses(uniqueClasses); // Установка классов в состояние
 
           if (uniqueClasses.length > 0) {
-            setSelectedClass(uniqueClasses[0]);
+            setSelectedClass(uniqueClasses[0]); // Устанавливаем первый класс как выбранный по умолчанию
           }
         } else {
           message.error("Данные с расписанием пусты или некорректны.");
         }
       })
       .catch((error) => {
-        message.error("Ошибка при загрузке данных с бэкенда");
-        console.error(error);
+        if (error.response?.status === 404) {
+          message.error("Файл с расписанием не найден");
+        } else {
+          message.error("Ошибка при загрузке данных с бэкенда");
+        }
       });
   };
 
   // Функция для загрузки расписания учителей
-  const loadTeachers = (fileName: string) => {
-    fetch(`http://localhost:5000/api/teachers/${fileName}`)
-      .then((res) => res.json())
-      .then((data: any[]) => {
+  const loadTeacherSchedule = (fileName: string, teacherName?: string) => {
+    const url = teacherName
+      ? `http://127.0.0.1:5000/api/teachers/${fileName}/${teacherName}`
+      : `http://127.0.0.1:5000/api/teachers/${fileName}`;
+
+    axios
+      .get(url) // Запрос на получение расписания учителя
+      .then((response) => {
+        const data = response.data;
         if (data && data.length > 0) {
-          setTeachers(data);
-          const firstTeacher = data[0]?.teacher || "";
-          setSelectedTeacher(firstTeacher);
+          setTeachers(data); // Сохранение данных по учителям
+          console.log(data);
         } else {
-          message.error("Данные с учителями пусты или некорректны.");
+          message.error("Данные по учителям пусты или некорректны.");
         }
       })
       .catch((error) => {
-        message.error("Ошибка при загрузке данных с бэкенда");
-        console.error(error);
+        if (error.response?.status === 404) {
+          if (teacherName) {
+            message.error(`Учитель ${teacherName} не найден`);
+          } else {
+            message.error("Файл с расписанием не найден");
+          }
+        } else {
+          message.error("Ошибка при загрузке данных с бэкенда");
+        }
       });
   };
 
   useEffect(() => {
     if (mode === "schedule") {
+      console.log(activeMenuKey);
       loadSchedule(dayToFileMap[activeMenuKey]);
     } else {
-      loadTeachers(dayToFileMap[activeMenuKey]);
+      loadTeacherSchedule(dayToFileMap[activeMenuKey]);
     }
   }, [activeMenuKey, mode]);
 

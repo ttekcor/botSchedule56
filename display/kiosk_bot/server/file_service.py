@@ -1,6 +1,6 @@
 import os
 
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'upload')
+UPLOAD_FOLDER = os.path.join(os.getcwd(), r'botSchedule56\display\kiosk_bot\server\upload')
 
 # Убедимся, что папка для загрузки существует
 if not os.path.exists(UPLOAD_FOLDER):

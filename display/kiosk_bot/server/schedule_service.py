@@ -1,13 +1,14 @@
 import os
 from openpyxl import load_workbook
 
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'upload')
+UPLOAD_FOLDER = os.path.join(os.getcwd(), r'botSchedule56\display\kiosk_bot\server\upload')
 
 def get_schedule_from_excel(file_name):
     """Читает файл Excel и возвращает данные в формате JSON."""
     file_path = os.path.join(UPLOAD_FOLDER, file_name)
     workbook = load_workbook(file_path)
     sheet = workbook.active
+    print(sheet)
 
     schedule = []
     for row in sheet.iter_rows(values_only=True):
