@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Layout, Menu, Table, Segmented, message } from "antd";
-import { LaptopOutlined, UserOutlined } from "@ant-design/icons";
+
 import axios from "axios";
 
 const { Sider, Content } = Layout;
@@ -24,10 +24,12 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
   const [classes, setClasses] = useState<string[]>([]);
   const [schedule, setSchedule] = useState<any[][]>([]);
   const [teachers, setTeachers] = useState<any[]>([]);
+  const [teacherSchedule, setTeacherSchedule] = useState<any[]>([]);
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [selectedTeacher, setSelectedTeacher] = useState<string>("");
   const [activeMenuKey, setActiveMenuKey] = useState<string>("classes");
   const [mode, setMode] = useState<"schedule" | "teachers">("schedule");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const dayToFileMap: { [key: string]: string } = {
     pn: "sch_pn.xlsx",
@@ -39,6 +41,7 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
 
   // Функция для загрузки расписания
   const loadSchedule = (fileName: string) => {
+    setLoading(true);
     axios
       .get(`http://127.0.0.1:5000/api/schedule/${fileName}`) // Запрос на получение расписания
       .then((response) => {
@@ -71,22 +74,29 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
         } else {
           message.error("Ошибка при загрузке данных с бэкенда");
         }
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   // Функция для загрузки расписания учителей
-  const loadTeacherSchedule = (fileName: string, teacherName?: string) => {
+  const loadTeacherList = (fileName: string, teacherName?: string) => {
     const url = teacherName
       ? `http://127.0.0.1:5000/api/teachers/${fileName}/${teacherName}`
       : `http://127.0.0.1:5000/api/teachers/${fileName}`;
-
+    console.log(url);
+    setLoading(true);
     axios
       .get(url) // Запрос на получение расписания учителя
-      .then((response) => {
-        const data = response.data;
-        if (data && data.length > 0) {
+      .then(({ data }) => {
+        console.log(data, "1");
+        if (!!data.schedule.length) {
+          console.log(data, "2");
+          if (teacherName) {
+            console.log(data, "3");
+            setTeacherSchedule(data);
+          }
+          console.log(data, "4");
           setTeachers(data); // Сохранение данных по учителям
-          console.log(data);
         } else {
           message.error("Данные по учителям пусты или некорректны.");
         }
@@ -101,17 +111,22 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
         } else {
           message.error("Ошибка при загрузке данных с бэкенда");
         }
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     if (mode === "schedule") {
-      console.log(activeMenuKey);
       loadSchedule(dayToFileMap[activeMenuKey]);
     } else {
-      loadTeacherSchedule(dayToFileMap[activeMenuKey]);
+      if (selectedTeacher === "") {
+        loadTeacherList(dayToFileMap[activeMenuKey]);
+      } else {
+        loadTeacherList(dayToFileMap[activeMenuKey], selectedTeacher);
+        console.log(getTeacherSchedule(selectedTeacher));
+      }
     }
-  }, [activeMenuKey, mode]);
+  }, [activeMenuKey, mode, selectedTeacher]);
 
   const getClassSchedule = (className: string): ScheduleRow[] => {
     const classIndex = schedule[0]?.indexOf(className);
@@ -123,12 +138,22 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
       teacher2: row[classIndex + 2],
     }));
   };
-
   const getTeacherSchedule = (teacherName: string): TeacherSchedule[] => {
-    const teacherData = teachers.find(
+    console.log("учителя", teacherSchedule, "||", teacherName);
+    const teacherData = teacherSchedule.find(
       (teacher: any) => teacher.teacher === teacherName
     );
-    return teacherData?.schedule || [];
+
+    if (!teacherData) {
+      return [];
+    }
+
+    // Форматируем данные для таблицы
+    return teacherData.schedule.map((entry: any) => ({
+      number: String(teacherData.schedule.indexOf(entry) + 1), // Номер урока
+      lesson: entry.lesson, // Урок
+      class: entry.classes.join(", "), // Класс (объединяем если несколько классов)
+    }));
   };
 
   const classColumns = [
@@ -159,42 +184,35 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
         value={activeMenuKey}
         onChange={(value) => setActiveMenuKey(value as string)}
       />
+
       <Layout>
         <Sider width={200}>
           <Menu
-            mode="inline"
+            mode="vertical"
             selectedKeys={[activeMenuKey]}
             onClick={(e) =>
               mode === "schedule"
                 ? setSelectedClass(e.key)
                 : setSelectedTeacher(e.key)
             }
-            items={[
-              {
-                key: "classes",
-                icon: <LaptopOutlined />,
-                label: "Классы",
-                children: classes.map((className) => ({
-                  key: className,
-                  label: className,
-                })),
-              },
-              {
-                key: "teachers",
-                icon: <UserOutlined />,
-                label: "Учителя",
-                children: teachers.map((teacher: any) => ({
-                  key: teacher.teacher,
-                  label: teacher.teacher,
-                })),
-              },
-            ]}
+            items={
+              mode === "schedule"
+                ? classes.map((className) => ({
+                    key: String(className),
+                    label: String(className),
+                  }))
+                : teachers.map((teacher) => ({
+                    key: String(teacher),
+                    label: String(teacher),
+                  }))
+            }
           />
         </Sider>
         <Content style={{ padding: "24px" }}>
           {mode === "schedule" && selectedClass && (
             <Table
               columns={classColumns}
+              loading={loading}
               dataSource={getClassSchedule(selectedClass)}
               rowKey="number"
             />
@@ -202,7 +220,8 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
           {mode === "teachers" && selectedTeacher && (
             <Table
               columns={teacherColumns}
-              dataSource={getTeacherSchedule(selectedTeacher)}
+              loading={loading}
+              dataSource={getTeacherSchedule(selectedTeacher)} // Используем функцию, которая фильтрует расписание учителя
               rowKey="number"
             />
           )}

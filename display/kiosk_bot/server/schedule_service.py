@@ -5,6 +5,7 @@ UPLOAD_FOLDER = os.path.join(os.getcwd(), r'botSchedule56\display\kiosk_bot\serv
 
 def get_schedule_from_excel(file_name):
     """Читает файл Excel и возвращает данные в формате JSON."""
+    
     file_path = os.path.join(UPLOAD_FOLDER, file_name)
     workbook = load_workbook(file_path)
     sheet = workbook.active
@@ -92,6 +93,7 @@ def get_teacher_schedule(file_name, teacher_name=None):
             'teacher': teacher,
             'schedule': [{'lesson': k, 'classes': v} for k, v in combined_schedule.items()]
         })
+        print(teacher_list)
 
     return teacher_list
 
