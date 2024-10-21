@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Layout, Menu, Table, Segmented, message } from "antd";
-
 import axios from "axios";
 
 const { Sider, Content } = Layout;
@@ -43,26 +42,25 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
   const loadSchedule = (fileName: string) => {
     setLoading(true);
     axios
-      .get(`http://127.0.0.1:5000/api/schedule/${fileName}`) // Запрос на получение расписания
+      .get(`http://127.0.0.1:5000/api/schedule/${fileName}`)
       .then((response) => {
-        const data = response.data; // Данные в формате JSON
+        const data = response.data;
         if (data && data.length > 0) {
-          setSchedule(data); // Сохранение данных расписания
+          setSchedule(data);
           console.log(data);
 
-          // Извлечение уникальных классов
           const uniqueClasses = Array.from(
             new Set(
               data[0]
-                .slice(2) // Пропускаем первые два столбца (например, номер урока и другие поля)
-                .filter((_: any, index: number) => index % 3 === 0) // Извлекаем каждый третий элемент (классы)
+                .slice(2)
+                .filter((_: any, index: number) => index % 3 === 0)
             )
           ) as string[];
 
-          setClasses(uniqueClasses); // Установка классов в состояние
+          setClasses(uniqueClasses);
 
           if (uniqueClasses.length > 0) {
-            setSelectedClass(uniqueClasses[0]); // Устанавливаем первый класс как выбранный по умолчанию
+            setSelectedClass(uniqueClasses[0]);
           }
         } else {
           message.error("Данные с расписанием пусты или некорректны.");
@@ -78,36 +76,22 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
       .finally(() => setLoading(false));
   };
 
-  // Функция для загрузки расписания учителей
-  const loadTeacherList = (fileName: string, teacherName?: string) => {
-    const url = teacherName
-      ? `http://127.0.0.1:5000/api/teachers/${fileName}/${teacherName}`
-      : `http://127.0.0.1:5000/api/teachers/${fileName}`;
-    console.log(url);
+  // Функция для загрузки списка учителей
+  const loadTeacherList = (fileName: string) => {
+    const url = `http://127.0.0.1:5000/api/teachers/${fileName}`;
     setLoading(true);
     axios
-      .get(url) // Запрос на получение расписания учителя
+      .get(url) // Запрос на получение списка учителей
       .then(({ data }) => {
-        console.log(data, "1");
-        if (!!data.schedule.length) {
-          console.log(data, "2");
-          if (teacherName) {
-            console.log(data, "3");
-            setTeacherSchedule(data);
-          }
-          console.log(data, "4");
-          setTeachers(data); // Сохранение данных по учителям
+        if (Array.isArray(data)) {
+          setTeachers(data); // Сохраняем имена учителей
         } else {
           message.error("Данные по учителям пусты или некорректны.");
         }
       })
       .catch((error) => {
         if (error.response?.status === 404) {
-          if (teacherName) {
-            message.error(`Учитель ${teacherName} не найден`);
-          } else {
-            message.error("Файл с расписанием не найден");
-          }
+          message.error("Файл с учителями не найден");
         } else {
           message.error("Ошибка при загрузке данных с бэкенда");
         }
@@ -115,31 +99,33 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => {
-    if (mode === "schedule") {
-      loadSchedule(dayToFileMap[activeMenuKey]);
-    } else {
-      if (selectedTeacher === "") {
-        loadTeacherList(dayToFileMap[activeMenuKey]);
-      } else {
-        loadTeacherList(dayToFileMap[activeMenuKey], selectedTeacher);
-        console.log(getTeacherSchedule(selectedTeacher));
-      }
-    }
-  }, [activeMenuKey, mode, selectedTeacher]);
-
-  const getClassSchedule = (className: string): ScheduleRow[] => {
-    const classIndex = schedule[0]?.indexOf(className);
-    if (classIndex === -1 || classIndex === undefined) return [];
-    return schedule.slice(1).map((row: any[]) => ({
-      number: row[0], // Номер урока
-      lesson: row[classIndex],
-      teacher1: row[classIndex + 1],
-      teacher2: row[classIndex + 2],
-    }));
+  // Функция для загрузки расписания конкретного учителя
+  const loadTeacherSchedule = (fileName: string, teacherName: string) => {
+    const url = `http://127.0.0.1:5000/api/teachers/${fileName}/${teacherName}`;
+    setLoading(true);
+    axios
+      .get(url) // Запрос на получение расписания конкретного учителя
+      .then(({ data }) => {
+        if (data && data.schedule.length > 0) {
+          setTeacherSchedule([data]); // Сохраняем расписание конкретного учителя
+        } else {
+          message.error(
+            `Расписание для учителя ${teacherName} не найдено или некорректно.`
+          );
+        }
+      })
+      .catch((error) => {
+        if (error.response?.status === 404) {
+          message.error(`Учитель ${teacherName} не найден`);
+        } else {
+          message.error("Ошибка при загрузке данных с бэкенда");
+        }
+      })
+      .finally(() => setLoading(false));
   };
+
+  // Функция для получения расписания выбранного учителя
   const getTeacherSchedule = (teacherName: string): TeacherSchedule[] => {
-    console.log("учителя", teacherSchedule, "||", teacherName);
     const teacherData = teacherSchedule.find(
       (teacher: any) => teacher.teacher === teacherName
     );
@@ -153,6 +139,31 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
       number: String(teacherData.schedule.indexOf(entry) + 1), // Номер урока
       lesson: entry.lesson, // Урок
       class: entry.classes.join(", "), // Класс (объединяем если несколько классов)
+    }));
+  };
+
+  useEffect(() => {
+    if (mode === "schedule") {
+      loadSchedule(dayToFileMap[activeMenuKey]); // Загрузка расписания классов
+    } else {
+      loadTeacherList(dayToFileMap[activeMenuKey]); // Загрузка списка учителей
+    }
+  }, [activeMenuKey, mode]);
+
+  useEffect(() => {
+    if (mode === "teachers" && selectedTeacher) {
+      loadTeacherSchedule(dayToFileMap[activeMenuKey], selectedTeacher); // Загрузка расписания конкретного учителя
+    }
+  }, [selectedTeacher, mode, activeMenuKey]);
+
+  const getClassSchedule = (className: string): ScheduleRow[] => {
+    const classIndex = schedule[0]?.indexOf(className);
+    if (classIndex === -1 || classIndex === undefined) return [];
+    return schedule.slice(1).map((row: any[]) => ({
+      number: row[0],
+      lesson: row[classIndex],
+      teacher1: row[classIndex + 1],
+      teacher2: row[classIndex + 2],
     }));
   };
 
@@ -221,7 +232,7 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
             <Table
               columns={teacherColumns}
               loading={loading}
-              dataSource={getTeacherSchedule(selectedTeacher)} // Используем функцию, которая фильтрует расписание учителя
+              dataSource={getTeacherSchedule(selectedTeacher)}
               rowKey="number"
             />
           )}
