@@ -3,7 +3,7 @@ from file_service import save_file, file_exists
 from schedule_service import get_schedule_from_excel, get_teacher_schedule
 
 def register_routes(app):
-    # Маршрут для загрузки файлов
+    # Маршрут для загрузки файлов расписания
     @app.route('/api/upload/<fileName>', methods=['POST'])
     def upload_file(fileName):
         if 'file' not in request.files:
@@ -13,10 +13,11 @@ def register_routes(app):
         if file.filename == '':
             return 'No selected file', 400
 
+        # Сохраняем файл на сервере
         save_file(file, fileName)
         return jsonify({'message': f'{fileName} uploaded successfully'}), 200
 
-    # Маршрут для получения расписания
+    # Маршрут для получения полного расписания из файла
     @app.route('/api/schedule/<fileName>', methods=['GET'])
     def get_schedule(fileName):
         print(f"Запрос расписания для файла: {fileName}")
@@ -26,38 +27,25 @@ def register_routes(app):
 
         schedule = get_schedule_from_excel(fileName)
         return jsonify(schedule), 200
+
+    # Маршрут для получения списка всех учителей или расписания конкретного учителя
     @app.route('/api/teachers/<fileName>', methods=['GET'])
-    def get_teacher_list(fileName, teacherName =None):
+    def get_teacher_list(fileName):
         if not file_exists(fileName):
             return 'File not found', 404
 
-        if teacherName:
-            schedule = get_teacher_schedule(fileName, teacherName)
-            
-            if schedule:
-                
-                return jsonify(schedule), 200
-            else:
-                return f'Teacher {teacherName} not found', 404
-        else:
-            all_schedules = get_teacher_schedule(fileName)
-         
-            print([all_schedules[i]['teacher'] for i in range(len(all_schedules))])
-            return jsonify([all_schedules[i]['teacher'] for i in range(len(all_schedules))]), 200
-        
-    # Маршрут для получения расписания учителя
+        all_schedules = get_teacher_schedule(fileName)
+        teacher_names = [schedule['teacher'] for schedule in all_schedules]
+        return jsonify(teacher_names), 200
+
+    # Маршрут для получения расписания конкретного учителя по имени
     @app.route('/api/teachers/<fileName>/<teacherName>', methods=['GET'])
-    def get_teacher(fileName, teacherName=None):
+    def get_teacher(fileName, teacherName):
         if not file_exists(fileName):
             return 'File not found', 404
 
-        if teacherName:
-            schedule = get_teacher_schedule(fileName, teacherName)
-            if schedule:
-                return jsonify(schedule), 200
-            else:
-                return f'Teacher {teacherName} not found', 404
+        schedule = get_teacher_schedule(fileName, teacherName)
+        if schedule:
+            return jsonify(schedule), 200
         else:
-            all_schedules = get_teacher_schedule(fileName)
-            return all_schedules, 200
-
+            return f'Teacher {teacherName} not found', 404

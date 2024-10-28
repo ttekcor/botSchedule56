@@ -101,13 +101,17 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
 
   // Функция для загрузки расписания конкретного учителя
   const loadTeacherSchedule = (fileName: string, teacherName: string) => {
+    // Декодируем имя учителя перед использованием в запросе
+
     const url = `http://127.0.0.1:5000/api/teachers/${fileName}/${teacherName}`;
     setLoading(true);
+
     axios
-      .get(url) // Запрос на получение расписания конкретного учителя
+      .get(url)
       .then(({ data }) => {
-        if (data && data.schedule.length > 0) {
-          setTeacherSchedule([data]); // Сохраняем расписание конкретного учителя
+        console.log(data, "req");
+        if (data) {
+          setTeacherSchedule([data]);
         } else {
           message.error(
             `Расписание для учителя ${teacherName} не найдено или некорректно.`
@@ -125,20 +129,15 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
   };
 
   // Функция для получения расписания выбранного учителя
-  const getTeacherSchedule = (teacherName: string): TeacherSchedule[] => {
-    const teacherData = teacherSchedule.find(
-      (teacher: any) => teacher.teacher === teacherName
-    );
+  const getTeacherSchedule = (): TeacherSchedule[] => {
+    console.log(teacherSchedule, "one person");
+    const teacherData = teacherSchedule;
 
-    if (!teacherData) {
-      return [];
-    }
-
-    // Форматируем данные для таблицы
-    return teacherData.schedule.map((entry: any) => ({
-      number: String(teacherData.schedule.indexOf(entry) + 1), // Номер урока
+    // Преобразуем вложенные массивы в одномерный массив объектов для таблицы
+    return teacherData.flat().map((entry: any) => ({
+      number: entry.number, // Номер урока
       lesson: entry.lesson, // Урок
-      class: entry.classes.join(", "), // Класс (объединяем если несколько классов)
+      class: entry.class, // Класс
     }));
   };
 
@@ -149,13 +148,12 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
       loadTeacherList(dayToFileMap[activeMenuKey]); // Загрузка списка учителей
     }
   }, [activeMenuKey, mode]);
-
   useEffect(() => {
     if (mode === "teachers" && selectedTeacher) {
-      loadTeacherSchedule(dayToFileMap[activeMenuKey], selectedTeacher); // Загрузка расписания конкретного учителя
+      loadTeacherSchedule(dayToFileMap[activeMenuKey], selectedTeacher);
+      console.log(teacherSchedule, "here"); // Загрузка расписания конкретного учителя
     }
-  }, [selectedTeacher, mode, activeMenuKey]);
-
+  }, [selectedTeacher, activeMenuKey, mode]);
   const getClassSchedule = (className: string): ScheduleRow[] => {
     const classIndex = schedule[0]?.indexOf(className);
     if (classIndex === -1 || classIndex === undefined) return [];
@@ -179,19 +177,32 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
     { title: "Урок", dataIndex: "lesson", key: "lesson" },
     { title: "Класс", dataIndex: "class", key: "class" },
   ];
+  const dayLabels: { [key: string]: string } = {
+    pn: "Понедельник",
+    vt: "Вторник",
+    sr: "Среда",
+    cht: "Четверг",
+    pt: "Пятница",
+  };
 
   return (
     <Layout>
       <Segmented
         options={[
-          { label: "Расписание", value: "schedule" },
+          { label: "Классы", value: "schedule" },
           { label: "Учителя", value: "teachers" },
         ]}
         value={mode}
         onChange={(value) => setMode(value as "schedule" | "teachers")}
       />
       <Segmented
-        options={["pn", "vt", "sr", "cht", "pt"]}
+        options={[
+          { label: dayLabels["pn"], value: "pn" },
+          { label: dayLabels["vt"], value: "vt" },
+          { label: dayLabels["sr"], value: "sr" },
+          { label: dayLabels["cht"], value: "cht" },
+          { label: dayLabels["pt"], value: "pt" },
+        ]}
         value={activeMenuKey}
         onChange={(value) => setActiveMenuKey(value as string)}
       />
@@ -222,18 +233,21 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
         <Content style={{ padding: "24px" }}>
           {mode === "schedule" && selectedClass && (
             <Table
+              locale={{ emptyText: "" }}
               columns={classColumns}
               loading={loading}
               dataSource={getClassSchedule(selectedClass)}
               rowKey="number"
+              pagination={false}
             />
           )}
           {mode === "teachers" && selectedTeacher && (
             <Table
               columns={teacherColumns}
               loading={loading}
-              dataSource={getTeacherSchedule(selectedTeacher)}
+              dataSource={getTeacherSchedule()}
               rowKey="number"
+              pagination={false}
             />
           )}
         </Content>

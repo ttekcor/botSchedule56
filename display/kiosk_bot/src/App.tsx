@@ -3,9 +3,9 @@ import { Layout, Tabs } from "antd";
 import MainPage from "./MainPage";
 import SchedulePage from "./SchedulePage";
 import UploadPage from "./UploadPage";
-
+import { Typography } from "antd";
 const { Header, Content, Footer } = Layout;
-
+const { Text } = Typography;
 const App: React.FC = () => {
   const [classes, setClasses] = useState<string[]>([]);
   const [schedule, setSchedule] = useState<any[][]>([]);
@@ -52,7 +52,7 @@ const App: React.FC = () => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Header>
-        <h1 style={{ color: "white" }}>Школьное расписание</h1>
+        <Text style={{ color: "white" }}>Школьное расписание</Text>
       </Header>
       <Content style={{ padding: "20px" }}>
         <Tabs defaultActiveKey="1" items={tabItems} />
