@@ -128,17 +128,19 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
       .finally(() => setLoading(false));
   };
 
-  // Функция для получения расписания выбранного учителя
   const getTeacherSchedule = (): TeacherSchedule[] => {
-    console.log(teacherSchedule, "one person");
     const teacherData = teacherSchedule;
 
     // Преобразуем вложенные массивы в одномерный массив объектов для таблицы
-    return teacherData.flat().map((entry: any) => ({
-      number: entry.number, // Номер урока
-      lesson: entry.lesson, // Урок
-      class: entry.class, // Класс
-    }));
+    return teacherData
+      .flat()
+      .filter((entry: any) => entry.number) // Удаляем пустые строки
+      .map((entry: any, index) => ({
+        key: `${entry.number}-${index}`, // Уникальный ключ
+        number: entry.number,
+        lesson: entry.lesson,
+        class: entry.class,
+      }));
   };
 
   useEffect(() => {
@@ -157,12 +159,17 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
   const getClassSchedule = (className: string): ScheduleRow[] => {
     const classIndex = schedule[0]?.indexOf(className);
     if (classIndex === -1 || classIndex === undefined) return [];
-    return schedule.slice(1).map((row: any[]) => ({
-      number: row[0],
-      lesson: row[classIndex],
-      teacher1: row[classIndex + 1],
-      teacher2: row[classIndex + 2],
-    }));
+
+    return schedule
+      .slice(1)
+      .filter((row: any[]) => row[classIndex]) // Удаляем пустые строки
+      .map((row: any[], index) => ({
+        key: `${row[0]}-${index}`, // Уникальный ключ
+        number: row[0],
+        lesson: row[classIndex],
+        teacher1: row[classIndex + 1],
+        teacher2: row[classIndex + 2],
+      }));
   };
 
   const classColumns = [
@@ -233,11 +240,10 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
         <Content style={{ padding: "24px" }}>
           {mode === "schedule" && selectedClass && (
             <Table
-              locale={{ emptyText: "" }}
               columns={classColumns}
               loading={loading}
               dataSource={getClassSchedule(selectedClass)}
-              rowKey="number"
+              rowKey="key"
               pagination={false}
             />
           )}
@@ -246,7 +252,7 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
               columns={teacherColumns}
               loading={loading}
               dataSource={getTeacherSchedule()}
-              rowKey="number"
+              rowKey="key"
               pagination={false}
             />
           )}
