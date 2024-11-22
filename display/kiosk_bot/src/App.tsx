@@ -4,8 +4,10 @@ import MainPage from "./MainPage";
 import SchedulePage from "./SchedulePage";
 import UploadPage from "./UploadPage";
 import { Typography } from "antd";
+
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
+
 const App: React.FC = () => {
   const [classes, setClasses] = useState<string[]>([]);
   const [schedule, setSchedule] = useState<any[][]>([]);
@@ -35,7 +37,7 @@ const App: React.FC = () => {
     {
       key: "1",
       label: "Главная",
-      children: <MainPage images={carouselImages} />,
+      children: <MainPage />, // Убрали передачу images
     },
     {
       key: "2",

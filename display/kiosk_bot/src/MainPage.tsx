@@ -1,17 +1,38 @@
-import React from "react";
-import { Carousel, Image, Layout } from "antd";
+import React, { useEffect, useState } from "react";
+import { Carousel, Image, Layout, message } from "antd";
+import axios from "axios";
 
-interface MainPageProps {
-  images: string[];
-}
+const MainPage: React.FC = () => {
+  const [images, setImages] = useState<string[]>([]);
 
-const MainPage: React.FC<MainPageProps> = ({ images }) => {
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1:5000/api/photos");
+        setImages(response.data); // Сохраняем URL изображений из API
+        console.log("Загруженные изображения:", response.data);
+      } catch (error) {
+        message.error("Ошибка при загрузке фотографий");
+        console.error("Ошибка запроса фотографий:", error);
+      }
+    };
+
+    fetchPhotos();
+  }, []);
+
   return (
     <Layout>
       <Carousel
         autoplay
-        style={{ maxWidth: "1000px", margin: "0 auto" }}
-        arrows={true}
+        style={{
+          width: "1000px",
+          height: "1000px",
+          margin: "0",
+          position: "relative",
+          lineHeight: "100px",
+        }}
+        arrows
+        dots={true} // Убираем стандартные точки
       >
         {images.length > 0 ? (
           images.map((image, index) => (
@@ -23,7 +44,15 @@ const MainPage: React.FC<MainPageProps> = ({ images }) => {
                 alignItems: "center",
               }}
             >
-              <Image width={1000} src={image} />
+              <Image
+                width={1000}
+                src={image} // Используем полный URL, полученный из API
+                alt={`Image ${index}`}
+                style={{
+                  objectFit: "cover", // Растягиваем изображение равномерно
+                  borderRadius: "8px", // Добавляем скругление
+                }}
+              />
             </div>
           ))
         ) : (

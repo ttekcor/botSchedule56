@@ -24,7 +24,7 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
   const [schedule, setSchedule] = useState<any[][]>([]);
   const [teachers, setTeachers] = useState<any[]>([]);
   const [teacherSchedule, setTeacherSchedule] = useState<any[]>([]);
-  const [selectedClass, setSelectedClass] = useState<string>("");
+  const [selectedClass, setSelectedClass] = useState<string>("5А");
   const [selectedTeacher, setSelectedTeacher] = useState<string>("");
   const [activeMenuKey, setActiveMenuKey] = useState<string>("classes");
   const [mode, setMode] = useState<"schedule" | "teachers">("schedule");
@@ -47,7 +47,6 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
         const data = response.data;
         if (data && data.length > 0) {
           setSchedule(data);
-          console.log(data);
 
           const uniqueClasses = Array.from(
             new Set(
@@ -109,7 +108,6 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
     axios
       .get(url)
       .then(({ data }) => {
-        console.log(data, "req");
         if (data) {
           setTeacherSchedule([data]);
         } else {
@@ -153,7 +151,6 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
   useEffect(() => {
     if (mode === "teachers" && selectedTeacher) {
       loadTeacherSchedule(dayToFileMap[activeMenuKey], selectedTeacher);
-      console.log(teacherSchedule, "here"); // Загрузка расписания конкретного учителя
     }
   }, [selectedTeacher, activeMenuKey, mode]);
   const getClassSchedule = (className: string): ScheduleRow[] => {
@@ -210,15 +207,27 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
           { label: dayLabels["cht"], value: "cht" },
           { label: dayLabels["pt"], value: "pt" },
         ]}
+        defaultValue="pn"
         value={activeMenuKey}
         onChange={(value) => setActiveMenuKey(value as string)}
       />
 
       <Layout>
-        <Sider width={200}>
+        {/* Боковое меню */}
+        <Sider
+          width={200}
+          style={{
+            height: "100vh", // Высота на весь экран
+            overflow: "hidden", // Убираем лишнюю прокрутку у самого Sider
+            background: "#fff", // Белый фон
+          }}
+        >
           <Menu
+            className="menu-container" // Используем единый класс
             mode="vertical"
-            selectedKeys={[activeMenuKey]}
+            selectedKeys={[
+              mode === "schedule" ? selectedClass : selectedTeacher,
+            ]}
             onClick={(e) =>
               mode === "schedule"
                 ? setSelectedClass(e.key)
@@ -237,6 +246,8 @@ const SchedulePage: React.FC<SchedulePageProps> = () => {
             }
           />
         </Sider>
+
+        {/* Основное содержимое */}
         <Content style={{ padding: "24px" }}>
           {mode === "schedule" && selectedClass && (
             <Table

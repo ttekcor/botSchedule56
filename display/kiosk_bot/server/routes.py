@@ -4,7 +4,7 @@ from schedule_service import get_schedule_from_excel, get_teacher_schedule
 import os
 
 def register_routes(app):
-    PHOTO_FOLDER = 'photos'
+    PHOTO_FOLDER = os.path.join(os.getcwd(), 'photos')  # Убедимся, что путь абсолютный
     os.makedirs(PHOTO_FOLDER, exist_ok=True)  # Создаем папку, если она не существует
 
     # Маршрут для загрузки фотографий
@@ -26,14 +26,18 @@ def register_routes(app):
     @app.route('/api/photos', methods=['GET'])
     def list_photos():
         photos = os.listdir(PHOTO_FOLDER)
-        photo_urls = [f'/photos/{photo}' for photo in photos]
+        # Формируем URL для каждого файла
+        photo_urls = [f'http://127.0.0.1:5000/photos/{photo}' for photo in photos]
         return jsonify(photo_urls)
 
-    # Маршрут для доступа к файлам фото
-    @app.route('/photos/<filename>')
+    # Маршрут для доступа к конкретному фото
+    @app.route('/photos/<path:filename>')
     def get_photo(filename):
-        return send_from_directory(PHOTO_FOLDER, filename)
-
+        try:
+            # Отправляем файл из папки PHOTO_FOLDER
+            return send_from_directory(PHOTO_FOLDER, filename)
+        except FileNotFoundError:
+            return jsonify({'error': f'File {filename} not found'}), 404
 
     # Маршрут для загрузки файлов расписания
     @app.route('/api/upload/<fileName>', methods=['POST'])
@@ -60,7 +64,7 @@ def register_routes(app):
         schedule = get_schedule_from_excel(fileName)
         return jsonify(schedule), 200
 
-    # Маршрут для получения списка всех учителей или расписания конкретного учителя
+    # Маршрут для получения списка всех учителей
     @app.route('/api/teachers/<fileName>', methods=['GET'])
     def get_teacher_list(fileName):
         if not file_exists(fileName):
@@ -70,7 +74,7 @@ def register_routes(app):
         teacher_names = [schedule['teacher'] for schedule in all_schedules]
         return jsonify(teacher_names), 200
 
-    # Маршрут для получения расписания конкретного учителя по имени
+    # Маршрут для получения расписания конкретного учителя
     @app.route('/api/teachers/<fileName>/<teacherName>', methods=['GET'])
     def get_teacher(fileName, teacherName):
         if not file_exists(fileName):
